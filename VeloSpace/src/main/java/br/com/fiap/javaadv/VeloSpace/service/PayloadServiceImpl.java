@@ -65,6 +65,12 @@ public class PayloadServiceImpl implements PayloadService{
                 .orElseThrow(() -> new RuntimeException("Payload not found with id: " + id));
     }
 
+    /*
+    * Esse metodo aqui eu usei o Claude para auxiliar, tanto que ele pediu
+    * para criar um DTO específico só para isso, quero entender como
+    * voce quer que esse metodo seja feito de fato
+    * */
+
     @Override
     public Payload patchApprovalById(Long id, PayloadApprovalDTO dto) {
         return repository.findById(id)
