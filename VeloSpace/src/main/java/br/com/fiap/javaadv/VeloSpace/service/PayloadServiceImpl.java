@@ -75,12 +75,8 @@ public class PayloadServiceImpl implements PayloadService{
     public Payload patchApprovalById(Long id, PayloadApprovalDTO dto) {
         return repository.findById(id)
                 .map(existing -> {
-                    if ("REJECTED".equalsIgnoreCase(dto.getStatus()) && dto.getJustification() == null) {
-                        throw new RuntimeException("Justification is required when rejecting a payload");
-                    }
                     existing.setPayloadStatus(payloadStatusRepository.findByDescription(dto.getStatus())
                             .orElseThrow(() -> new RuntimeException("Status not found: " + dto.getStatus())));
-                    if (dto.getJustification() != null) existing.setJustification(dto.getJustification());
                     return repository.save(existing);
                 })
                 .orElseThrow(() -> new RuntimeException("Payload not found with id: " + id));

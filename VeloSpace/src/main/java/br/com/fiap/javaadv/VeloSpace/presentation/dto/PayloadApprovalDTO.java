@@ -10,6 +10,5 @@ import lombok.Setter;
 public class PayloadApprovalDTO {
 
     private @Getter @Setter String status;
-    private @Getter @Setter String justification;
 
 }
