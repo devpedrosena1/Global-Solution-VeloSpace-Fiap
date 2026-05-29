@@ -42,10 +42,6 @@ public class Payload {
     @JoinColumn(name = "shipper_id", nullable = false)
     private @Getter @Setter Shipper shipper;
 
-    @ManyToOne
-    @JoinColumn(name = "rocket_id", nullable = false)
-    private @Getter @Setter Rocket rocket;
-
     @Column(name = "justification", length = 500)
     private @Getter @Setter String justification;
 
@@ -59,7 +55,8 @@ public class Payload {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Payload payload = (Payload) o;
         return Objects.equals(payloadId, payload.payloadId);
     }

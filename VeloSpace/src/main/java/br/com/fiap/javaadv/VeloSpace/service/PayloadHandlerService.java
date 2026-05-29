@@ -2,14 +2,20 @@ package br.com.fiap.javaadv.VeloSpace.service;
 
 import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
 
-public interface PayloadHandlerService {
+public interface PayloadHandlerService<T, ID> {
 
     PayloadHandler findMe();
-    PayloadHandler findById(Long id);
-    PayloadHandler create(PayloadHandler payloadHandler);
-    PayloadHandler updateById(Long id, PayloadHandler payloadHandler);
-    PayloadHandler patchById(Long id, PayloadHandler payloadHandler);
-    PayloadHandler patchPasswordById(Long id, PayloadHandler payloadHandler);
-    void deleteById(Long id);
+
+    PayloadHandler findById(ID id);
+
+    PayloadHandler create(T o);
+
+    PayloadHandler updateById(ID id, T o);
+
+    PayloadHandler patchById(ID id, T o);
+
+    PayloadHandler patchPasswordById(ID id, T o);
+
+    void deleteById(ID id);
 
 }

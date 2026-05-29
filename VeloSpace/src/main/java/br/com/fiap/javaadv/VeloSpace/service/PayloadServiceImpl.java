@@ -3,13 +3,13 @@ package br.com.fiap.javaadv.VeloSpace.service;
 import br.com.fiap.javaadv.VeloSpace.model.Payload;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadStatusRepository;
-import br.com.fiap.javaadv.VeloSpace.presentation.dto.PayloadApprovalDTO;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PayloadApprovalDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PayloadServiceImpl implements PayloadService{
+public class PayloadServiceImpl implements PayloadService {
 
     private final PayloadRepository repository;
     private final PayloadStatusRepository payloadStatusRepository;
@@ -36,7 +36,6 @@ public class PayloadServiceImpl implements PayloadService{
                     existing.setTrackingCode(payload.getTrackingCode());
                     existing.setPayloadStatus(payload.getPayloadStatus());
                     existing.setShipper(payload.getShipper());
-                    existing.setRocket(payload.getRocket());
                     existing.setJustification(payload.getJustification());
                     existing.setPayloadPriority(payload.getPayloadPriority());
                     existing.setLaunchProvider(payload.getLaunchProvider());
@@ -49,27 +48,36 @@ public class PayloadServiceImpl implements PayloadService{
     public Payload patchById(Long id, Payload payload) {
         return repository.findById(id)
                 .map(existing -> {
-                    if (payload.getHeight() != 0) existing.setHeight(payload.getHeight());
-                    if (payload.getWidth() != 0) existing.setWidth(payload.getWidth());
-                    if (payload.getDepth() != 0) existing.setDepth(payload.getDepth());
-                    if (payload.getWeight() != 0) existing.setWeight(payload.getWeight());
-                    if (payload.getTrackingCode() != null) existing.setTrackingCode(payload.getTrackingCode());
-                    if (payload.getPayloadStatus() != null) existing.setPayloadStatus(payload.getPayloadStatus());
-                    if (payload.getShipper() != null) existing.setShipper(payload.getShipper());
-                    if (payload.getRocket() != null) existing.setRocket(payload.getRocket());
-                    if (payload.getJustification() != null) existing.setJustification(payload.getJustification());
-                    if (payload.getPayloadPriority() != null) existing.setPayloadPriority(payload.getPayloadPriority());
-                    if (payload.getLaunchProvider() != null) existing.setLaunchProvider(payload.getLaunchProvider());
+                    if (payload.getHeight() != 0)
+                        existing.setHeight(payload.getHeight());
+                    if (payload.getWidth() != 0)
+                        existing.setWidth(payload.getWidth());
+                    if (payload.getDepth() != 0)
+                        existing.setDepth(payload.getDepth());
+                    if (payload.getWeight() != 0)
+                        existing.setWeight(payload.getWeight());
+                    if (payload.getTrackingCode() != null)
+                        existing.setTrackingCode(payload.getTrackingCode());
+                    if (payload.getPayloadStatus() != null)
+                        existing.setPayloadStatus(payload.getPayloadStatus());
+                    if (payload.getShipper() != null)
+                        existing.setShipper(payload.getShipper());
+                    if (payload.getJustification() != null)
+                        existing.setJustification(payload.getJustification());
+                    if (payload.getPayloadPriority() != null)
+                        existing.setPayloadPriority(payload.getPayloadPriority());
+                    if (payload.getLaunchProvider() != null)
+                        existing.setLaunchProvider(payload.getLaunchProvider());
                     return repository.save(existing);
                 })
                 .orElseThrow(() -> new RuntimeException("Payload not found with id: " + id));
     }
 
     /*
-    * Esse metodo aqui eu usei o Claude para auxiliar, tanto que ele pediu
-    * para criar um DTO específico só para isso, quero entender como
-    * voce quer que esse metodo seja feito de fato
-    * */
+     * Esse metodo aqui eu usei o Claude para auxiliar, tanto que ele pediu
+     * para criar um DTO específico só para isso, quero entender como
+     * voce quer que esse metodo seja feito de fato
+     */
 
     @Override
     public Payload patchApprovalById(Long id, PayloadApprovalDTO dto) {
@@ -86,7 +94,8 @@ public class PayloadServiceImpl implements PayloadService{
     public Payload patchTrackingById(Long id, Payload payload) {
         return repository.findById(id)
                 .map(existing -> {
-                    if (payload.getTrackingCode() != null) existing.setTrackingCode(payload.getTrackingCode());
+                    if (payload.getTrackingCode() != null)
+                        existing.setTrackingCode(payload.getTrackingCode());
                     return repository.save(existing);
                 })
                 .orElseThrow(() -> new RuntimeException("Payload not found with id: " + id));

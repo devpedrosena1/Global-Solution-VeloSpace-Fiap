@@ -1,0 +1,54 @@
+package br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.LaunchProvider;
+
+import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+@Builder
+public class CreateLaunchProviderDTO {
+
+    @NotBlank(message = "O CNPJ não pode estar em branco")
+    @Pattern(regexp = "^\\d{14}$", message = "O CNPJ deve conter 14 dígitos")
+    private String cnpj;
+
+    @NotBlank(message = "A razão social não pode estar em branco")
+    @Size(min = 2, max = 255, message = "A razão social deve ter entre 2 e 255 caracteres")
+    private String corporateName;
+
+    @NotBlank(message = "O e-mail não pode estar em branco")
+    @Email(message = "O e-mail deve ser válido")
+    @Size(max = 255, message = "O e-mail deve ter no máximo 255 caracteres")
+    private String email;
+
+    @NotNull(message = "O telefone não pode ser nulo")
+    @Digits(integer = 15, fraction = 0, message = "O telefone deve conter no máximo 15 dígitos")
+    private Long phone;
+
+    @NotBlank(message = "A senha não pode estar em branco")
+    @Size(min = 6, max = 255, message = "A senha deve ter entre 6 e 255 caracteres")
+    private String password;
+
+    public static LaunchProvider toEntity(CreateLaunchProviderDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        return LaunchProvider.builder()
+                .corporateName(dto.getCorporateName())
+                .cnpj(dto.getCnpj())
+                .email(dto.getEmail())
+                .phone(dto.getPhone())
+                .hashedPassword(dto.getPassword())
+                .build();
+    }
+
+}

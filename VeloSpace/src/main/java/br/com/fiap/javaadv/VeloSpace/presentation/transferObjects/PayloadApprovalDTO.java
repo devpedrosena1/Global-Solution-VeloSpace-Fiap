@@ -1,4 +1,4 @@
-package br.com.fiap.javaadv.VeloSpace.presentation.dto;
+package br.com.fiap.javaadv.VeloSpace.presentation.transferObjects;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
