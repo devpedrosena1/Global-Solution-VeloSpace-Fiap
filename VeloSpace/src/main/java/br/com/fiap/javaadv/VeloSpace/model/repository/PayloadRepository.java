@@ -8,5 +8,6 @@ import java.util.List;
 public interface PayloadRepository extends JpaRepository<Payload, Long> {
 
     List<Payload> findByShipper_ShipperId(Long shipperId);
+    List<Payload> findByLaunchProvider_LaunchProviderId(Long launchProviderId);
 
 }

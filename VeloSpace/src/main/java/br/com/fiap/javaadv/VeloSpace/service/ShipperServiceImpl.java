@@ -1,5 +1,6 @@
 package br.com.fiap.javaadv.VeloSpace.service;
 
+import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
 import br.com.fiap.javaadv.VeloSpace.model.Payload;
 import br.com.fiap.javaadv.VeloSpace.model.Shipper;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadRepository;
@@ -17,6 +18,12 @@ public class ShipperServiceImpl implements ShipperService {
 
     private final ShipperRepository repository;
     private final PayloadRepository payloadRepository;
+
+    @Override
+    public LaunchProvider findMe() {
+        // TODO: Podemos implementar isso depois quando tiver security (não sei como voce quer implementar ao certo)
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 
     @Override
     public List<Shipper> findAll() {
