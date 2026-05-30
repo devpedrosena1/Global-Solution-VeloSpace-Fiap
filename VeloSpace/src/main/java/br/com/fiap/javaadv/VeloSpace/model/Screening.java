@@ -10,9 +10,9 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@AllArgsConstructor
+@Table(name = "vs_screening")
 @NoArgsConstructor
-@Table(name = "screening")
+@AllArgsConstructor
 public class Screening {
 
     @Id
@@ -20,14 +20,22 @@ public class Screening {
     @Column(name = "screening_id")
     private @Getter @Setter Long screeningId;
 
+    @ManyToOne
+    @JoinColumn(name = "payload_id", nullable = false)
+    private @Getter @Setter Payload payload;
+
+    @ManyToOne
+    @JoinColumn(name = "payload_handler_id", nullable = false)
+    private @Getter @Setter PayloadHandler payloadHandler;
+
     @Column(name = "measured_height", nullable = false)
     private @Getter @Setter int measuredHeight;
 
     @Column(name = "measured_width", nullable = false)
     private @Getter @Setter int measuredWidth;
 
-    @Column(name = "measure_depth", nullable = false)
-    private @Getter @Setter int measureDepth;
+    @Column(name = "measure_length", nullable = false)
+    private @Getter @Setter int measureLength;
 
     @Column(name = "measured_weight", nullable = false)
     private @Getter @Setter int measuredWeight;
@@ -35,17 +43,10 @@ public class Screening {
     @Column(name = "inspection_date", nullable = false)
     private @Getter @Setter LocalDate inspectionDate;
 
-    @ManyToOne
-    @JoinColumn(name = "payload_handler_id", nullable = false)
-    private @Getter @Setter PayloadHandler payloadHandler;
-
-    @ManyToOne
-    @JoinColumn(name = "payload_id", nullable = false)
-    private @Getter @Setter Payload payload;
-
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Screening screening = (Screening) o;
         return Objects.equals(screeningId, screening.screeningId);
     }
@@ -54,4 +55,5 @@ public class Screening {
     public int hashCode() {
         return Objects.hashCode(screeningId);
     }
+
 }

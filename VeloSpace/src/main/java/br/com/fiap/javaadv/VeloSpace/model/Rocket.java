@@ -2,17 +2,19 @@ package br.com.fiap.javaadv.VeloSpace.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@AllArgsConstructor
+@Table(name = "vs_rocket")
 @NoArgsConstructor
-@Table(name = "rocket")
+@AllArgsConstructor
+@Builder
 public class Rocket {
 
     @Id
@@ -20,23 +22,23 @@ public class Rocket {
     @Column(name = "rocket_id")
     private @Getter @Setter Long rocketId;
 
-    @Column(name = "name", nullable = false, length = 40)
+    @Column(name = "name", nullable = false, unique = true, length = 55)
     private @Getter @Setter String name;
 
     @Column(name = "capacity_height", nullable = false)
-    private @Getter @Setter int capacityHeight;
+    private @Getter @Setter Integer capacityHeight;
 
     @Column(name = "capacity_width", nullable = false)
-    private @Getter @Setter int capacityWidth;
+    private @Getter @Setter Integer capacityWidth;
 
-    @Column(name = "capacity_depth", nullable = false)
-    private @Getter @Setter int capacityDepth;
+    @Column(name = "capacity_length", nullable = false)
+    private @Getter @Setter Integer capacityLength;
 
     @Column(name = "capacity_weight", nullable = false)
-    private @Getter @Setter int capacityWeight;
+    private @Getter @Setter Integer capacityWeight;
 
-    @Column(name = "launch_date", nullable = false)
-    private @Getter @Setter LocalDate launchDate;
+    @Column(name = "launch_date")
+    private @Getter @Setter LocalDateTime launchDate;
 
     @ManyToOne
     @JoinColumn(name = "rocket_status_id", nullable = false)
@@ -44,7 +46,8 @@ public class Rocket {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Rocket rocket = (Rocket) o;
         return Objects.equals(rocketId, rocket.rocketId);
     }
@@ -53,4 +56,5 @@ public class Rocket {
     public int hashCode() {
         return Objects.hashCode(rocketId);
     }
+
 }

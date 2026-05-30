@@ -9,22 +9,26 @@ import lombok.Setter;
 import java.util.Objects;
 
 @Entity
-@AllArgsConstructor
+@Table(name = "vs_payload_status")
 @NoArgsConstructor
-@Table(name = "payload_status")
+@AllArgsConstructor
 public class PayloadStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payload_status_id")
-    private @Getter @Setter Long  payloadStatusId;
+    private @Getter @Setter Long payloadStatusId;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "code", nullable = false, unique = true, length = 55)
+    private @Getter @Setter String code;
+
+    @Column(name = "description", nullable = false, unique = true, length = 55)
     private @Getter @Setter String description;
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         PayloadStatus that = (PayloadStatus) o;
         return Objects.equals(payloadStatusId, that.payloadStatusId);
     }
@@ -33,4 +37,5 @@ public class PayloadStatus {
     public int hashCode() {
         return Objects.hashCode(payloadStatusId);
     }
+
 }
