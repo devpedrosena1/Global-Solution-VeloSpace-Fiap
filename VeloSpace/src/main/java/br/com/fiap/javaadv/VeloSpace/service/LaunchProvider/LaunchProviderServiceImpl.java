@@ -8,6 +8,7 @@ import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadHandlerRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
+import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,13 +22,13 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
 
     private final LaunchProviderRepository launchProviderRepository;
 
-    private final ShipperRepository shipperRepository;
-
     private final PayloadHandlerRepository payloadHandlerRepository;
 
     private final PayloadRepository payloadRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final UserValidationService userValidationService;
 
     @Override
     public LaunchProvider findMe() {
@@ -59,18 +60,8 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
 
     @Override
     public LaunchProvider create(LaunchProvider launchProvider) {
-        shipperRepository.findByEmail(launchProvider.getEmail()).ifPresent(other -> {
-            throw new FieldValidationException("email", "Este e-mail já está em uso.");
-        });
 
-        payloadHandlerRepository.findByEmail(launchProvider.getEmail()).ifPresent(other -> {
-            throw new FieldValidationException("email", "Este e-mail já está em uso.");
-        });
-
-        launchProviderRepository.findByEmail(launchProvider.getEmail()).ifPresent(other -> {
-            throw new FieldValidationException("email", "Este e-mail já está em uso.");
-        });
-
+        userValidationService.validUniqueEmail(launchProvider.getEmail());
         launchProvider.setHashedPassword(passwordEncoder.encode(launchProvider.getHashedPassword()));
         return launchProviderRepository.save(launchProvider);
     }

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -34,14 +34,14 @@ public class Screening {
     @Column(name = "measured_width", nullable = false)
     private @Getter @Setter int measuredWidth;
 
-    @Column(name = "measure_length", nullable = false)
+    @Column(name = "measured_length", nullable = false)
     private @Getter @Setter int measureLength;
 
     @Column(name = "measured_weight", nullable = false)
     private @Getter @Setter int measuredWeight;
 
     @Column(name = "inspection_date", nullable = false)
-    private @Getter @Setter LocalDate inspectionDate;
+    private @Getter @Setter LocalDateTime inspectionDate;
 
     @Override
     public boolean equals(Object o) {

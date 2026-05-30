@@ -8,6 +8,7 @@ import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadHandlerRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
+import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,13 +24,11 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
     private final ShipperRepository shipperRepository;
 
-    private final LaunchProviderRepository launchProviderRepository;
-
-    private final PayloadHandlerRepository payloadHandlerRepository;
-
     private final PasswordEncoder passwordEncoder;
 
     private final PayloadRepository payloadRepository;
+
+    private final UserValidationService userValidationService;
 
     @Override
     public LaunchProvider findMe() {
@@ -60,18 +59,8 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
     @Override
     public Shipper create(Shipper shipper) {
-        shipperRepository.findByEmail(shipper.getEmail()).ifPresent(other -> {
-            throw new FieldValidationException("email", "Este e-mail já está em uso.");
-        });
 
-        payloadHandlerRepository.findByEmail(shipper.getEmail()).ifPresent(other -> {
-            throw new FieldValidationException("email", "Este e-mail já está em uso.");
-        });
-
-        launchProviderRepository.findByEmail(shipper.getEmail()).ifPresent(other -> {
-            throw new FieldValidationException("email", "Este e-mail já está em uso.");
-        });
-
+        userValidationService.validUniqueEmail(shipper.getEmail());
         shipper.setHashedPassword(passwordEncoder.encode(shipper.getHashedPassword()));
         return shipperRepository.save(shipper);
     }

@@ -1,10 +1,8 @@
 package br.com.fiap.javaadv.VeloSpace.service.PayloadHandler;
 
-import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
-import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadHandlerRepository;
-import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
+import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,11 +14,9 @@ public class PayloadHandlerServiceImpl implements PayloadHandlerService<PayloadH
 
     private final PayloadHandlerRepository payloadHandlerRepository;
 
-    private final ShipperRepository shipperRepository;
-
-    private final LaunchProviderRepository launchProviderRepository;
-
     private final PasswordEncoder passwordEncoder;
+
+    private final UserValidationService userValidationService;
 
     @Override
     public PayloadHandler findMe() {
@@ -36,18 +32,8 @@ public class PayloadHandlerServiceImpl implements PayloadHandlerService<PayloadH
 
     @Override
     public PayloadHandler create(PayloadHandler payloadHandler) {
-        shipperRepository.findByEmail(payloadHandler.getEmail()).ifPresent(other -> {
-            throw new FieldValidationException("email", "Este e-mail já está em uso.");
-        });
 
-        payloadHandlerRepository.findByEmail(payloadHandler.getEmail()).ifPresent(other -> {
-            throw new FieldValidationException("email", "Este e-mail já está em uso.");
-        });
-
-        launchProviderRepository.findByEmail(payloadHandler.getEmail()).ifPresent(other -> {
-            throw new FieldValidationException("email", "Este e-mail já está em uso.");
-        });
-
+        userValidationService.validUniqueEmail(payloadHandler.getEmail());
         payloadHandler.setHashedPassword(passwordEncoder.encode(payloadHandler.getHashedPassword()));
         return payloadHandlerRepository.save(payloadHandler);
     }
