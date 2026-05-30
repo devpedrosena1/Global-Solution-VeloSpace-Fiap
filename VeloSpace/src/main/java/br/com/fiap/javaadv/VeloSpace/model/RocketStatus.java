@@ -28,9 +28,6 @@ public class RocketStatus {
     @Column(name = "description", nullable = false, unique = true, length = 55)
     private @Getter @Setter String description;
 
-    @Column(name = "launch_date")
-    private @Getter @Setter LocalDateTime launchDate;
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass())

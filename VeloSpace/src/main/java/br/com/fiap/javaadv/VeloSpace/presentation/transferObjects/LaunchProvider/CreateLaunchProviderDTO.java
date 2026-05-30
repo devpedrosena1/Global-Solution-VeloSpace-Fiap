@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.br.CNPJ;
 
 @Setter
 @Getter
@@ -17,6 +18,7 @@ public class CreateLaunchProviderDTO {
 
     @NotBlank(message = "O CNPJ não pode estar em branco")
     @Pattern(regexp = "^\\d{14}$", message = "O CNPJ deve conter 14 dígitos")
+    @CNPJ
     private String cnpj;
 
     @NotBlank(message = "A razão social não pode estar em branco")

@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.br.CPF;
 
 @Setter
 @Getter
@@ -22,6 +23,7 @@ public class CreatePayloadHandlerDTO {
 
     @NotNull(message = "O CPF não pode ser nulo")
     @Digits(integer = 11, fraction = 0, message = "O CPF deve conter no máximo 11 dígitos")
+    @CPF
     private Long cpf;
 
     @NotBlank(message = "O nome não pode estar em branco")

@@ -10,4 +10,5 @@ public interface ShipperRepository extends JpaRepository<Shipper, Long> {
 
     public Optional<Shipper> findByEmail(String email);
 
+    Optional<Shipper> findByShipperDocument(String shipperDocument);
 }
