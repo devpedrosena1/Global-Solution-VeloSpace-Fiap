@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LaunchProviderRepository extends JpaRepository<LaunchProvider, Long> {
 
-    public Optional<LaunchProvider> findByEmail(String email);
+    Optional<LaunchProvider> findByEmail(String email);
 
+    Optional<LaunchProvider> findByCnpj(String cnpj);
 }

@@ -4,12 +4,12 @@ import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationEx
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
 import br.com.fiap.javaadv.VeloSpace.model.Payload;
 import br.com.fiap.javaadv.VeloSpace.model.Shipper;
-import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
-import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadHandlerRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -59,6 +59,26 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
     @Override
     public Shipper create(Shipper shipper) {
+        shipperRepository.findByShipperDocument(shipper.getShipperDocument())
+                .ifPresent(other -> {
+                    throw new FieldValidationException("shipperDocument", "Este documento já está em uso.");
+                });
+
+        if(shipper.getType().equals("PF")){
+            CPFValidator cpfValidator = new CPFValidator();
+            cpfValidator.initialize(null);
+            if (!cpfValidator.isValid(shipper.getShipperDocument(), null)) {
+                throw new FieldValidationException("shipperDocument", "Este documento é inválido.");
+            }
+        }
+
+        if(shipper.getType().equals("PJ")){
+            CNPJValidator cnpjValidator = new CNPJValidator();
+            cnpjValidator.initialize(null);
+            if (!cnpjValidator.isValid(shipper.getShipperDocument(), null)) {
+                throw new FieldValidationException("shipperDocument", "Este documento é inválido.");
+            }
+        }
 
         userValidationService.validUniqueEmail(shipper.getEmail());
         shipper.setHashedPassword(passwordEncoder.encode(shipper.getHashedPassword()));

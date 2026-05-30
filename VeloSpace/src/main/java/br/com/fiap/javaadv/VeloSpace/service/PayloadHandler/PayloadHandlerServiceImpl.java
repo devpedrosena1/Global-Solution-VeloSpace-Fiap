@@ -1,5 +1,6 @@
 package br.com.fiap.javaadv.VeloSpace.service.PayloadHandler;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadHandlerRepository;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
@@ -33,6 +34,10 @@ public class PayloadHandlerServiceImpl implements PayloadHandlerService<PayloadH
     @Override
     public PayloadHandler create(PayloadHandler payloadHandler) {
 
+        payloadHandlerRepository.findByCpf(payloadHandler.getCpf())
+                .ifPresent(other -> {
+                    throw new FieldValidationException("cpf", "Este CPF já está em uso.");
+                });
         userValidationService.validUniqueEmail(payloadHandler.getEmail());
         payloadHandler.setHashedPassword(passwordEncoder.encode(payloadHandler.getHashedPassword()));
         return payloadHandlerRepository.save(payloadHandler);

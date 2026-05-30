@@ -61,6 +61,10 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
     @Override
     public LaunchProvider create(LaunchProvider launchProvider) {
         userValidationService.validUniqueEmail(launchProvider.getEmail());
+        launchProviderRepository.findByCnpj(launchProvider.getCnpj())
+                .ifPresent(other -> {
+                    throw new FieldValidationException("cnpj", "Este CNPJ já está em uso.");
+        });
         launchProvider.setHashedPassword(passwordEncoder.encode(launchProvider.getHashedPassword()));
         return launchProviderRepository.save(launchProvider);
     }
