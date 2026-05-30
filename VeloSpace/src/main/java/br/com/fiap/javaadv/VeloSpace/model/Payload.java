@@ -9,9 +9,9 @@ import lombok.Setter;
 import java.util.Objects;
 
 @Entity
-@AllArgsConstructor
+@Table(name = "vs_payload")
 @NoArgsConstructor
-@Table(name = "payload")
+@AllArgsConstructor
 public class Payload {
 
     @Id
@@ -19,39 +19,42 @@ public class Payload {
     @Column(name = "payload_id")
     private @Getter @Setter Long payloadId;
 
+    @ManyToOne
+    @JoinColumn(name = "shipper_id", nullable = false)
+    private @Getter @Setter Shipper shipper;
+
+    @ManyToOne
+    @JoinColumn(name = "launch_provider_id", nullable = false)
+    private @Getter @Setter LaunchProvider launchProvider;
+
+    @Column(name = "name", nullable = false, length = 55)
+    private @Getter @Setter String name;
+
     @Column(name = "height", nullable = false)
     private @Getter @Setter int height;
 
     @Column(name = "width", nullable = false)
     private @Getter @Setter int width;
 
-    @Column(name = "depth", nullable = false)
-    private @Getter @Setter int depth;
+    @Column(name = "length", nullable = false)
+    private @Getter @Setter int length;
 
     @Column(name = "weight", nullable = false)
     private @Getter @Setter int weight;
 
-    @Column(name = "tracking_code", length = 55)
-    private @Getter @Setter String trackingCode;
+    @Column(name = "launch_justification", nullable = false, length = 500)
+    private @Getter @Setter String launchJustification;
 
     @ManyToOne
     @JoinColumn(name = "payload_status_id", nullable = false)
     private @Getter @Setter PayloadStatus payloadStatus;
 
     @ManyToOne
-    @JoinColumn(name = "shipper_id", nullable = false)
-    private @Getter @Setter Shipper shipper;
-
-    @Column(name = "justification", length = 500)
-    private @Getter @Setter String justification;
-
-    @ManyToOne
-    @JoinColumn(name = "payload_priority_id", nullable = false)
+    @JoinColumn(name = "payload_priority_id")
     private @Getter @Setter PayloadPriority payloadPriority;
 
-    @ManyToOne
-    @JoinColumn(name = "launch_provider_id", nullable = false)
-    private @Getter @Setter LaunchProvider launchProvider;
+    @Column(name = "tracking_code", length = 55)
+    private @Getter @Setter String trackingCode;
 
     @Override
     public boolean equals(Object o) {
@@ -65,4 +68,5 @@ public class Payload {
     public int hashCode() {
         return Objects.hashCode(payloadId);
     }
+
 }

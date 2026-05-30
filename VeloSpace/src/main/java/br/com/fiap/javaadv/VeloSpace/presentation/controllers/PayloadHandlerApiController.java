@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PayloadHandler.CreatePayloadHandlerDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PayloadHandler.PayloadHandlerResponseDTO;
-import br.com.fiap.javaadv.VeloSpace.service.PayloadHandlerService;
+import br.com.fiap.javaadv.VeloSpace.service.PayloadHandler.PayloadHandlerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

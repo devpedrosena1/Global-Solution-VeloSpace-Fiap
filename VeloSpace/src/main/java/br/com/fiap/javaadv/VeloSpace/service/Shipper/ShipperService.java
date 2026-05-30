@@ -1,4 +1,4 @@
-package br.com.fiap.javaadv.VeloSpace.service;
+package br.com.fiap.javaadv.VeloSpace.service.Shipper;
 
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
 import br.com.fiap.javaadv.VeloSpace.model.Payload;

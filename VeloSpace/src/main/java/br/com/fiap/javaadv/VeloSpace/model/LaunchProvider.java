@@ -21,13 +21,13 @@ public class LaunchProvider {
     @Column(name = "launch_provider_id")
     private @Getter @Setter Long launchProviderId;
 
-    @Column(name = "cnpj", nullable = false, unique = true)
+    @Column(name = "cnpj", nullable = false, unique = true, length = 14)
     private @Getter @Setter String cnpj;
 
     @Column(name = "corporate_name", nullable = false, length = 255)
     private @Getter @Setter String corporateName;
 
-    @Column(name = "email", nullable = false, unique = true, length = 55)
+    @Column(name = "email", nullable = false, unique = true, length = 255)
     private @Getter @Setter String email;
 
     @Column(name = "phone")

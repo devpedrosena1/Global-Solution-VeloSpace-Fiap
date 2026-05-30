@@ -4,7 +4,6 @@ import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -29,7 +28,6 @@ public class CreateLaunchProviderDTO {
     @Size(max = 255, message = "O e-mail deve ter no máximo 255 caracteres")
     private String email;
 
-    @NotNull(message = "O telefone não pode ser nulo")
     @Digits(integer = 15, fraction = 0, message = "O telefone deve conter no máximo 15 dígitos")
     private Long phone;
 

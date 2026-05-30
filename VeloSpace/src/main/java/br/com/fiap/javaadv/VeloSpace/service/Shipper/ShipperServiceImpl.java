@@ -1,9 +1,11 @@
-package br.com.fiap.javaadv.VeloSpace.service;
+package br.com.fiap.javaadv.VeloSpace.service.Shipper;
 
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
 import br.com.fiap.javaadv.VeloSpace.model.Payload;
 import br.com.fiap.javaadv.VeloSpace.model.Shipper;
+import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
+import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadHandlerRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +23,17 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
     private final ShipperRepository shipperRepository;
 
+    private final LaunchProviderRepository launchProviderRepository;
+
+    private final PayloadHandlerRepository payloadHandlerRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final PayloadRepository payloadRepository;
 
     @Override
     public LaunchProvider findMe() {
-        // TODO: Podemos implementar isso depois quando tiver security (não sei como
+        // TO-DO: Podemos implementar isso depois quando tiver security (não sei como
         // voce quer implementar ao certo)
         throw new UnsupportedOperationException("Not implemented yet");
     }
@@ -54,8 +60,15 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
     @Override
     public Shipper create(Shipper shipper) {
-        // TO-DO Validar se o email exite em qualquer uma das tabelas de entidades
         shipperRepository.findByEmail(shipper.getEmail()).ifPresent(other -> {
+            throw new FieldValidationException("email", "Este e-mail já está em uso.");
+        });
+
+        payloadHandlerRepository.findByEmail(shipper.getEmail()).ifPresent(other -> {
+            throw new FieldValidationException("email", "Este e-mail já está em uso.");
+        });
+
+        launchProviderRepository.findByEmail(shipper.getEmail()).ifPresent(other -> {
             throw new FieldValidationException("email", "Este e-mail já está em uso.");
         });
 
@@ -114,4 +127,5 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
     public void deleteById(Long id) {
         shipperRepository.deleteById(id);
     }
+
 }

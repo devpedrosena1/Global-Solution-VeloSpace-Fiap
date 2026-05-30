@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.fiap.javaadv.VeloSpace.model.Shipper;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Shipper.CreateShipperDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Shipper.ShipperResponseDTO;
-import br.com.fiap.javaadv.VeloSpace.service.ShipperService;
+import br.com.fiap.javaadv.VeloSpace.service.Shipper.ShipperService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

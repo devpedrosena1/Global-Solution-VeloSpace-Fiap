@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.LaunchProvider.CreateLaunchProviderDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.LaunchProvider.LaunchProviderResponseDTO;
-import br.com.fiap.javaadv.VeloSpace.service.LaunchProviderService;
+import br.com.fiap.javaadv.VeloSpace.service.LaunchProvider.LaunchProviderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

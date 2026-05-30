@@ -48,13 +48,15 @@ public class CreatePayloadHandlerDTO {
         }
 
         return PayloadHandler.builder()
-                .launchProvider(LaunchProvider.builder().launchProviderId(dto.getLaunchProviderId()).build())
+                .launchProvider(
+                        LaunchProvider.builder().launchProviderId(dto.getLaunchProviderId()).build())
                 .cpf(dto.getCpf())
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
                 .hashedPassword(dto.getPassword())
-                .payloadHandlerStatus(PayloadHandlerStatus.builder().payloadHandlerStatusId(1L).build())
+                .payloadHandlerStatus(
+                        PayloadHandlerStatus.builder().payloadHandlerStatusId(1L).build())
                 .build();
     }
 

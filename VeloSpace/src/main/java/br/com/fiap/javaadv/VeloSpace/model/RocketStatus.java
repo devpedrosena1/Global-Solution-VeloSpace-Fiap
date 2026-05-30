@@ -7,19 +7,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "vs_payload_handler_status")
+@Table(name = "vs_rocket_status")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PayloadHandlerStatus {
+public class RocketStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payload_handler_status_id")
-    private @Getter @Setter Long payloadHandlerStatusId;
+    @Column(name = "rocket_status_id")
+    private @Getter @Setter Long rocketStatusId;
 
     @Column(name = "code", nullable = false, unique = true, length = 55)
     private @Getter @Setter String code;
@@ -27,17 +28,20 @@ public class PayloadHandlerStatus {
     @Column(name = "description", nullable = false, unique = true, length = 55)
     private @Getter @Setter String description;
 
+    @Column(name = "launch_date")
+    private @Getter @Setter LocalDateTime launchDate;
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass())
             return false;
-        PayloadHandlerStatus that = (PayloadHandlerStatus) o;
-        return Objects.equals(payloadHandlerStatusId, that.payloadHandlerStatusId);
+        RocketStatus rocketStatus = (RocketStatus) o;
+        return Objects.equals(rocketStatusId, rocketStatus.rocketStatusId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(payloadHandlerStatusId);
+        return Objects.hashCode(rocketStatusId);
     }
 
 }

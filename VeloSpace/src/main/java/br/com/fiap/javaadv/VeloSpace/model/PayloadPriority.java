@@ -9,9 +9,9 @@ import lombok.Setter;
 import java.util.Objects;
 
 @Entity
-@AllArgsConstructor
+@Table(name = "vs_payload_priority")
 @NoArgsConstructor
-@Table(name = "payload_priority")
+@AllArgsConstructor
 public class PayloadPriority {
 
     @Id
@@ -19,15 +19,16 @@ public class PayloadPriority {
     @Column(name = "payload_priority_id")
     private @Getter @Setter Long payloadPriorityId;
 
-    @Column(name = "description", nullable = false, length = 40)
-    private @Getter @Setter String description;
+    @Column(name = "priority_level", nullable = false)
+    private @Getter @Setter Long priority_level;
 
-    @Column(name = "level", nullable = false)
-    private @Getter @Setter int level;
+    @Column(name = "description", nullable = false, length = 55)
+    private @Getter @Setter String description;
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         PayloadPriority that = (PayloadPriority) o;
         return Objects.equals(payloadPriorityId, that.payloadPriorityId);
     }
@@ -36,4 +37,5 @@ public class PayloadPriority {
     public int hashCode() {
         return Objects.hashCode(payloadPriorityId);
     }
+
 }

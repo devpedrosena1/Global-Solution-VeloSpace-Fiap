@@ -3,19 +3,14 @@ spring:
     name: VeloSpace
 
   datasource:
-    url: jdbc:h2:mem:velospace  # ${DB_URL}
-    username: sa # ${DB_USERNAME}
-    password:  # ${DB_PASSWORD}
-    driver-class-name: org.h2.Driver  # oracle.jdbc.OracleDriver
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: oracle.jdbc.OracleDriver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 
     show-sql: true
 
@@ -24,4 +19,4 @@ spring:
         "[format_sql]": true
     
 jwt:
-  secret: SECRET  # ${JWT_SECRET}
+  secret: ${JWT_SECRET}

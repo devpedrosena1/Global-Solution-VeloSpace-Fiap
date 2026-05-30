@@ -1,4 +1,4 @@
-package br.com.fiap.javaadv.VeloSpace.service;
+package br.com.fiap.javaadv.VeloSpace.service.LaunchProvider;
 
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
@@ -7,6 +7,7 @@ import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
 import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadHandlerRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadRepository;
+import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,8 @@ import java.util.List;
 public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchProvider, Long> {
 
     private final LaunchProviderRepository launchProviderRepository;
+
+    private final ShipperRepository shipperRepository;
 
     private final PayloadHandlerRepository payloadHandlerRepository;
 
@@ -56,7 +59,14 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
 
     @Override
     public LaunchProvider create(LaunchProvider launchProvider) {
-        // TO-DO Validar se o email exite em qualquer uma das tabelas de entidades
+        shipperRepository.findByEmail(launchProvider.getEmail()).ifPresent(other -> {
+            throw new FieldValidationException("email", "Este e-mail já está em uso.");
+        });
+
+        payloadHandlerRepository.findByEmail(launchProvider.getEmail()).ifPresent(other -> {
+            throw new FieldValidationException("email", "Este e-mail já está em uso.");
+        });
+
         launchProviderRepository.findByEmail(launchProvider.getEmail()).ifPresent(other -> {
             throw new FieldValidationException("email", "Este e-mail já está em uso.");
         });

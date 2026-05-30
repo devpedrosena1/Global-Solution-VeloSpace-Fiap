@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.util.Objects;
 
 @Entity
-@Table(name = "payload_handler")
+@Table(name = "vs_payload_handler")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

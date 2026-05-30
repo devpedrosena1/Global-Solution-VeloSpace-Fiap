@@ -24,7 +24,7 @@ public class Shipper {
     @Column(name = "type", nullable = false, length = 2)
     private @Getter @Setter String type;
 
-    @Column(name = "name", nullable = false, length = 55)
+    @Column(name = "name", nullable = false, length = 255)
     private @Getter @Setter String name;
 
     @Column(name = "email", nullable = false, unique = true, length = 255)

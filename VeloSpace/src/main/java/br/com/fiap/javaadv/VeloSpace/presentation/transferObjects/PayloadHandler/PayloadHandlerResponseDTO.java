@@ -33,7 +33,8 @@ public record PayloadHandlerResponseDTO(
                 .email(payloadHandler.getEmail())
                 .phone(payloadHandler.getPhone())
                 .status(
-                        PayloadHandlerStatusResponseDTO.from(payloadHandler.getPayloadHandlerStatus()))
+                        PayloadHandlerStatusResponseDTO
+                                .from(payloadHandler.getPayloadHandlerStatus()))
                 .build();
     }
 

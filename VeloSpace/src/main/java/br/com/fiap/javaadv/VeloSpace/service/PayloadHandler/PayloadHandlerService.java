@@ -1,4 +1,4 @@
-package br.com.fiap.javaadv.VeloSpace.service;
+package br.com.fiap.javaadv.VeloSpace.service.PayloadHandler;
 
 import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
 
