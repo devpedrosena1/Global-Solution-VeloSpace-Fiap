@@ -60,7 +60,6 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
 
     @Override
     public LaunchProvider create(LaunchProvider launchProvider) {
-
         userValidationService.validUniqueEmail(launchProvider.getEmail());
         launchProvider.setHashedPassword(passwordEncoder.encode(launchProvider.getHashedPassword()));
         return launchProviderRepository.save(launchProvider);
