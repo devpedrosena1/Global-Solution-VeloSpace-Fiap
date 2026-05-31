@@ -2,13 +2,17 @@ package br.com.fiap.javaadv.VeloSpace.presentation.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PayloadHandler.CreatePayloadHandlerDTO;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PayloadHandler.ApprovalPayloadHandlerDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PayloadHandler.PayloadHandlerResponseDTO;
 import br.com.fiap.javaadv.VeloSpace.service.PayloadHandler.PayloadHandlerService;
 import jakarta.validation.Valid;
@@ -29,6 +33,25 @@ public class PayloadHandlerApiController {
         PayloadHandler newPayloadHandler = payloadHandlerService
                 .create(CreatePayloadHandlerDTO.toEntity(createPayloadHandlerDTO));
         return new ResponseEntity<>(PayloadHandlerResponseDTO.from(newPayloadHandler), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{id}/approval")
+    public ResponseEntity<Void> approval(
+            @PathVariable Long id,
+            @Valid @RequestBody ApprovalPayloadHandlerDTO approvalPayloadHandlerDTO,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        payloadHandlerService.approval(authUser, id, approvalPayloadHandlerDTO.approval());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/reapply")
+    public ResponseEntity<Void> reapply(
+            @PathVariable Long id,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        payloadHandlerService.reapply(authUser, id);
+        return ResponseEntity.noContent().build();
     }
 
 }

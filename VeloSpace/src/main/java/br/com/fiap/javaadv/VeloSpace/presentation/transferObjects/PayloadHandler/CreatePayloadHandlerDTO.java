@@ -2,7 +2,6 @@ package br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PayloadHandle
 
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
 import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
-import br.com.fiap.javaadv.VeloSpace.model.PayloadHandlerStatus;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -24,7 +23,7 @@ public class CreatePayloadHandlerDTO {
     @NotNull(message = "O CPF não pode ser nulo")
     @Digits(integer = 11, fraction = 0, message = "O CPF deve conter no máximo 11 dígitos")
     @CPF
-    private Long cpf;
+    private String cpf;
 
     @NotBlank(message = "O nome não pode estar em branco")
     @Size(min = 2, max = 255, message = "O nome deve ter entre 2 e 255 caracteres")
@@ -35,7 +34,6 @@ public class CreatePayloadHandlerDTO {
     @Size(max = 255, message = "O e-mail deve ter no máximo 255 caracteres")
     private String email;
 
-    @NotNull(message = "O telefone não pode ser nulo")
     @Digits(integer = 15, fraction = 0, message = "O telefone deve conter no máximo 15 dígitos")
     private Long phone;
 
@@ -57,8 +55,6 @@ public class CreatePayloadHandlerDTO {
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
                 .hashedPassword(dto.getPassword())
-                .payloadHandlerStatus(
-                        PayloadHandlerStatus.builder().payloadHandlerStatusId(1L).build())
                 .build();
     }
 

@@ -12,5 +12,5 @@ public interface PayloadHandlerRepository extends JpaRepository<PayloadHandler, 
 
     List<PayloadHandler> findByLaunchProvider_LaunchProviderId(Long launchProviderId);
 
-    Optional<PayloadHandler> findByCpf(Long cpf);
+    Optional<PayloadHandler> findByCpf(String cpf);
 }

@@ -8,8 +8,7 @@ import lombok.Builder;
 public record PayloadHandlerResponseDTO(
         Long payloadHandlerId,
         Long launchProviderId,
-        String launchProviderCorporateName,
-        Long cpf,
+        String cpf,
         String name,
         String email,
         Long phone,
@@ -26,8 +25,6 @@ public record PayloadHandlerResponseDTO(
                 .payloadHandlerId(payloadHandler.getPayloadHandlerId())
                 .launchProviderId(
                         payloadHandler.getLaunchProvider().getLaunchProviderId())
-                .launchProviderCorporateName(
-                        payloadHandler.getLaunchProvider().getCorporateName())
                 .cpf(payloadHandler.getCpf())
                 .name(payloadHandler.getName())
                 .email(payloadHandler.getEmail())

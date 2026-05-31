@@ -26,7 +26,7 @@ public class PayloadHandler {
     private @Getter @Setter LaunchProvider launchProvider;
 
     @Column(name = "cpf", nullable = false, unique = true)
-    private @Getter @Setter Long cpf;
+    private @Getter @Setter String cpf;
 
     @Column(name = "name", nullable = false, length = 255)
     private @Getter @Setter String name;

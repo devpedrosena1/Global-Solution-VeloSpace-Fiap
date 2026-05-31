@@ -59,26 +59,25 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
     @Override
     public Shipper create(Shipper shipper) {
-        shipperRepository.findByShipperDocument(shipper.getShipperDocument())
-                .ifPresent(other -> {
-                    throw new FieldValidationException("shipperDocument", "Este documento já está em uso.");
-                });
 
-        if(shipper.getType().equals("PF")){
+        if (shipper.getType().equals("PF")) {
             CPFValidator cpfValidator = new CPFValidator();
             cpfValidator.initialize(null);
             if (!cpfValidator.isValid(shipper.getShipperDocument(), null)) {
                 throw new FieldValidationException("shipperDocument", "Este documento é inválido.");
             }
-        }
-
-        if(shipper.getType().equals("PJ")){
+        } else {
             CNPJValidator cnpjValidator = new CNPJValidator();
             cnpjValidator.initialize(null);
             if (!cnpjValidator.isValid(shipper.getShipperDocument(), null)) {
                 throw new FieldValidationException("shipperDocument", "Este documento é inválido.");
             }
         }
+
+        shipperRepository.findByShipperDocument(shipper.getShipperDocument())
+                .ifPresent(other -> {
+                    throw new FieldValidationException("shipperDocument", "Este documento já está em uso.");
+                });
 
         userValidationService.validUniqueEmail(shipper.getEmail());
         shipper.setHashedPassword(passwordEncoder.encode(shipper.getHashedPassword()));

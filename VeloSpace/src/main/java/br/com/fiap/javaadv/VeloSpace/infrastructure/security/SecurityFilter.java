@@ -1,9 +1,11 @@
 package br.com.fiap.javaadv.VeloSpace.infrastructure.security;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -38,7 +40,9 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (user.isPresent()) {
             JwtUserData userData = user.get();
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userData, null, null);
+                    userData,
+                    null,
+                    List.of(new SimpleGrantedAuthority("ROLE_" + userData.role())));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
