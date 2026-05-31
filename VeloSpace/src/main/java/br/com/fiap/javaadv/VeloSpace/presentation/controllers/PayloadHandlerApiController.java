@@ -3,11 +3,7 @@ package br.com.fiap.javaadv.VeloSpace.presentation.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
@@ -26,6 +22,12 @@ import lombok.extern.slf4j.Slf4j;
 public class PayloadHandlerApiController {
 
     private final PayloadHandlerService<PayloadHandler, Long> payloadHandlerService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PayloadHandlerResponseDTO> findById(@PathVariable Long id) {
+        PayloadHandler payloadHandler = payloadHandlerService.findById(id);
+        return ResponseEntity.ok(PayloadHandlerResponseDTO.from(payloadHandler));
+    }
 
     @PostMapping
     public ResponseEntity<PayloadHandlerResponseDTO> save(
@@ -51,6 +53,19 @@ public class PayloadHandlerApiController {
             @AuthenticationPrincipal JwtUserData authUser) {
 
         payloadHandlerService.reapply(authUser, id);
+        return ResponseEntity.noContent().build();
+    };
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PayloadHandlerResponseDTO> updateById(@PathVariable Long id,
+            @Valid @RequestBody CreatePayloadHandlerDTO dto) {
+        PayloadHandler updated = payloadHandlerService.updateById(id, CreatePayloadHandlerDTO.toEntity(dto));
+        return ResponseEntity.ok(PayloadHandlerResponseDTO.from(updated));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        payloadHandlerService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
