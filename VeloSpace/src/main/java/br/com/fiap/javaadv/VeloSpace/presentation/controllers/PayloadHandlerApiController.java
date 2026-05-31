@@ -2,10 +2,7 @@ package br.com.fiap.javaadv.VeloSpace.presentation.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PayloadHandler.CreatePayloadHandlerDTO;
@@ -29,6 +26,24 @@ public class PayloadHandlerApiController {
         PayloadHandler newPayloadHandler = payloadHandlerService
                 .create(CreatePayloadHandlerDTO.toEntity(createPayloadHandlerDTO));
         return new ResponseEntity<>(PayloadHandlerResponseDTO.from(newPayloadHandler), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PayloadHandlerResponseDTO> findById(@PathVariable Long id) {
+        PayloadHandler payloadHandler = payloadHandlerService.findById(id);
+        return ResponseEntity.ok(PayloadHandlerResponseDTO.from(payloadHandler));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PayloadHandlerResponseDTO> updateById(@PathVariable Long id, @Valid @RequestBody CreatePayloadHandlerDTO dto) {
+        PayloadHandler updated = payloadHandlerService.updateById(id, CreatePayloadHandlerDTO.toEntity(dto));
+        return ResponseEntity.ok(PayloadHandlerResponseDTO.from(updated));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        payloadHandlerService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
