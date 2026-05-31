@@ -7,7 +7,6 @@ import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
 import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadHandlerRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadRepository;
-import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
 
@@ -60,11 +59,13 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
 
     @Override
     public LaunchProvider create(LaunchProvider launchProvider) {
-        userValidationService.validUniqueEmail(launchProvider.getEmail());
         launchProviderRepository.findByCnpj(launchProvider.getCnpj())
                 .ifPresent(other -> {
                     throw new FieldValidationException("cnpj", "Este CNPJ já está em uso.");
-        });
+                });
+
+        userValidationService.validUniqueEmail(launchProvider.getEmail());
+
         launchProvider.setHashedPassword(passwordEncoder.encode(launchProvider.getHashedPassword()));
         return launchProviderRepository.save(launchProvider);
     }
