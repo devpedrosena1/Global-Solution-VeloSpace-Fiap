@@ -1,26 +1,21 @@
 package br.com.fiap.javaadv.VeloSpace.service.PayloadHandler;
 
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
-import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
 
 public interface PayloadHandlerService<T, ID> {
 
-    PayloadHandler findMe();
+    T findByIdOrThrow(ID id);
 
-    PayloadHandler findById(ID id);
+    T findById(ID id, JwtUserData authUser);
 
-    PayloadHandler create(T o);
+    T create(T o);
 
-    PayloadHandler updateById(ID id, T o);
+    T updateById(ID id, T o, JwtUserData authUser);
 
-    PayloadHandler patchById(ID id, T o);
+    void deleteById(ID id, JwtUserData authUser);
 
-    Void approval(JwtUserData authUser, Long id, boolean approval);
+    void approval(ID id, boolean approval, JwtUserData authUser);
 
-    Void reapply(JwtUserData authUser, Long id);
-
-    PayloadHandler patchPasswordById(ID id, T o);
-
-    void deleteById(ID id);
+    void reapply(ID id, JwtUserData authUser);
 
 }

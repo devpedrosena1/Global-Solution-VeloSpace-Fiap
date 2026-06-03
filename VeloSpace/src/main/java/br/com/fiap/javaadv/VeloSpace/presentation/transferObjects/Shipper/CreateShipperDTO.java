@@ -20,8 +20,7 @@ public class CreateShipperDTO {
     private String type;
 
     @NotBlank(message = "O documento não pode estar em branco")
-    @Size(min = 11, max = 14, message = "O documento deve ter entre 11 e 14 caracteres")
-    @Pattern(regexp = "^[0-9]+$", message = "O documento deve conter apenas números")
+    @Digits(integer = 14, fraction = 0, message = "O documento deve conter no máximo 14 dígitos")
     private String shipperDocument;
 
     @NotBlank(message = "O nome não pode estar em branco")
@@ -41,6 +40,7 @@ public class CreateShipperDTO {
     private String password;
 
     public static Shipper toEntity(CreateShipperDTO dto) {
+
         if (dto == null) {
             return null;
         }

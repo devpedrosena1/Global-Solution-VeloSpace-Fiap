@@ -28,8 +28,11 @@ public class PayloadHandlerApiController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar Payload Handler por ID", description = "Retorna os dados de um Payload Handler específico, identificado pelo seu ID.")
-    public ResponseEntity<PayloadHandlerResponseDTO> findById(@PathVariable Long id) {
-        PayloadHandler payloadHandler = payloadHandlerService.findById(id);
+    public ResponseEntity<PayloadHandlerResponseDTO> findById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        PayloadHandler payloadHandler = payloadHandlerService.findById(id, authUser);
         return ResponseEntity.ok(PayloadHandlerResponseDTO.from(payloadHandler));
     }
 
@@ -37,6 +40,7 @@ public class PayloadHandlerApiController {
     @Operation(summary = "Criar um novo Payload Handler", description = "Recebe os dados de um Payload Handler e o cria no sistema.")
     public ResponseEntity<PayloadHandlerResponseDTO> save(
             @Valid @RequestBody CreatePayloadHandlerDTO createPayloadHandlerDTO) {
+
         PayloadHandler newPayloadHandler = payloadHandlerService
                 .create(CreatePayloadHandlerDTO.toEntity(createPayloadHandlerDTO));
         return new ResponseEntity<>(PayloadHandlerResponseDTO.from(newPayloadHandler), HttpStatus.CREATED);
@@ -46,10 +50,10 @@ public class PayloadHandlerApiController {
     @Operation(summary = "Aprovar ou rejeitar um Payload Handler", description = "Recebe o ID de um Payload Handler e os dados de aprovação, e atualiza o status de aprovação do Payload Handler no sistema.")
     public ResponseEntity<Void> approval(
             @PathVariable Long id,
-            @Valid @RequestBody ApprovalPayloadHandlerDTO approvalPayloadHandlerDTO,
+            @Valid @RequestBody ApprovalPayloadHandlerDTO dto,
             @AuthenticationPrincipal JwtUserData authUser) {
 
-        payloadHandlerService.approval(authUser, id, approvalPayloadHandlerDTO.approval());
+        payloadHandlerService.approval(id, dto.approval(), authUser);
         return ResponseEntity.noContent().build();
     }
 
@@ -59,22 +63,28 @@ public class PayloadHandlerApiController {
             @PathVariable Long id,
             @AuthenticationPrincipal JwtUserData authUser) {
 
-        payloadHandlerService.reapply(authUser, id);
+        payloadHandlerService.reapply(id, authUser);
         return ResponseEntity.noContent().build();
     };
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar um Payload Handler por ID", description = "Recebe os dados atualizados de um Payload Handler e o ID do Payload Handler a ser atualizado, e realiza a atualização no sistema.")
-    public ResponseEntity<PayloadHandlerResponseDTO> updateById(@PathVariable Long id,
-            @Valid @RequestBody CreatePayloadHandlerDTO dto) {
-        PayloadHandler updated = payloadHandlerService.updateById(id, CreatePayloadHandlerDTO.toEntity(dto));
+    public ResponseEntity<PayloadHandlerResponseDTO> updateById(
+            @PathVariable Long id,
+            @Valid @RequestBody CreatePayloadHandlerDTO dto,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        PayloadHandler updated = payloadHandlerService.updateById(id, CreatePayloadHandlerDTO.toEntity(dto), authUser);
         return ResponseEntity.ok(PayloadHandlerResponseDTO.from(updated));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar um Payload Handler por ID", description = "Recebe o ID de um Payload Handler e o deleta do sistema.")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        payloadHandlerService.deleteById(id);
+    public ResponseEntity<Void> deleteById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        payloadHandlerService.deleteById(id, authUser);
         return ResponseEntity.noContent().build();
     }
 

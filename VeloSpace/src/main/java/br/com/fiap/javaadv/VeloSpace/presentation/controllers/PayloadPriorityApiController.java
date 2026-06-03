@@ -1,5 +1,6 @@
 package br.com.fiap.javaadv.VeloSpace.presentation.controllers;
 
+import br.com.fiap.javaadv.VeloSpace.model.PayloadPriority;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PayloadPriority.PayloadPriorityResponseDTO;
 import br.com.fiap.javaadv.VeloSpace.service.PayloadPriority.PayloadPriorityService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +19,7 @@ import java.util.List;
 @Tag(name = "Payload Priority API", description = "Endpoints para gerenciamento de Prioridades de Payload")
 public class PayloadPriorityApiController {
 
-    private final PayloadPriorityService payloadPriorityService;
+    private final PayloadPriorityService<PayloadPriority, Long> payloadPriorityService;
 
     @GetMapping
     @Operation(summary = "Listar todas as prioridades de payload", description = "Retorna uma lista de todas as prioridades de payload disponíveis no sistema.")

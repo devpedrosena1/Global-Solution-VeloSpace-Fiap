@@ -6,6 +6,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.ScreeningResult;
+
 @Entity
 @Table(name = "vs_screening")
 @NoArgsConstructor
@@ -27,16 +29,19 @@ public class Screening {
     private @Getter @Setter PayloadHandler payloadHandler;
 
     @Column(name = "measured_height", nullable = false)
-    private @Getter @Setter int measuredHeight;
+    private @Getter @Setter Integer measuredHeight;
 
     @Column(name = "measured_width", nullable = false)
-    private @Getter @Setter int measuredWidth;
+    private @Getter @Setter Integer measuredWidth;
 
     @Column(name = "measured_length", nullable = false)
-    private @Getter @Setter int measureLength;
+    private @Getter @Setter Integer measuredLength;
 
     @Column(name = "measured_weight", nullable = false)
-    private @Getter @Setter int measuredWeight;
+    private @Getter @Setter Integer measuredWeight;
+
+    @Column(name = "result", nullable = false, length = 55)
+    private @Getter @Setter ScreeningResult result;
 
     @Column(name = "inspection_date", nullable = false)
     private @Getter @Setter LocalDateTime inspectionDate;
@@ -46,7 +51,7 @@ public class Screening {
         if (o == null || getClass() != o.getClass())
             return false;
         Screening screening = (Screening) o;
-        return Objects.equals(screeningId, screening.screeningId);
+        return Objects.equals(screeningId, screening.getScreeningId());
     }
 
     @Override

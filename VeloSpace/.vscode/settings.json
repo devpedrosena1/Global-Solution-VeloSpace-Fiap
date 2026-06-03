@@ -4,10 +4,13 @@
         "csrf",
         "datasource",
         "fiap",
+        "jackson",
         "javaadv",
         "jdbc",
         "nullable",
         "orcl",
+        "springdoc",
+        "springframework",
         "velospace"
     ]
 }

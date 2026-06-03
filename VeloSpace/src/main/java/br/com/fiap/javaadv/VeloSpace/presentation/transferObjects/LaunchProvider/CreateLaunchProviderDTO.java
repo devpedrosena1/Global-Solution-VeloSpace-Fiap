@@ -4,7 +4,7 @@ import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,8 +16,8 @@ import org.hibernate.validator.constraints.br.CNPJ;
 @Builder
 public class CreateLaunchProviderDTO {
 
-    @NotBlank(message = "O CNPJ não pode estar em branco")
-    @Pattern(regexp = "^\\d{14}$", message = "O CNPJ deve conter 14 dígitos")
+    @NotNull(message = "O CNPJ não pode ser nulo")
+    @Digits(integer = 14, fraction = 0, message = "O CNPJ deve conter no máximo 14 dígitos")
     @CNPJ
     private String cnpj;
 
@@ -50,5 +50,4 @@ public class CreateLaunchProviderDTO {
                 .hashedPassword(dto.getPassword())
                 .build();
     }
-
 }

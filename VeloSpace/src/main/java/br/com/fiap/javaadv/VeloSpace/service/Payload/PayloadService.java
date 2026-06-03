@@ -1,22 +1,17 @@
 package br.com.fiap.javaadv.VeloSpace.service.Payload;
 
-import br.com.fiap.javaadv.VeloSpace.model.Payload;
-import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PayloadApprovalDTO;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 
 public interface PayloadService<T, ID> {
 
-    Payload findById(ID id);
+    T findByIdOrThrow(ID id);
 
-    Payload create(T o);
+    T findById(ID id, JwtUserData authUser);
 
-    Payload updateById(ID id, T o);
+    T create(T o, JwtUserData authUser);
 
-    Payload patchById(ID id, T o);
+    T updateById(ID id, T o, JwtUserData authUser);
 
-    Payload patchApprovalById(ID id, PayloadApprovalDTO dto);
-
-    Payload patchTrackingById(ID id, T o);
-
-    void deleteById(ID id);
+    void deleteById(ID id, JwtUserData authUser);
 
 }
