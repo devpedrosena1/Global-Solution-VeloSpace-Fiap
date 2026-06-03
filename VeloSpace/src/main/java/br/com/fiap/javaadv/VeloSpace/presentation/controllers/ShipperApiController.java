@@ -25,15 +25,6 @@ public class ShipperApiController {
 
     private final ShipperService<Shipper, Long> shipperService;
 
-    @PostMapping
-    @Operation(summary = "Criar um novo Shipper", description = "Recebe os dados de um Shipper e o cria no sistema.")
-    public ResponseEntity<ShipperResponseDTO> save(
-            @Valid @RequestBody CreateShipperDTO createShipperDTO) {
-
-        Shipper newShipper = shipperService.create(CreateShipperDTO.toEntity(createShipperDTO));
-        return new ResponseEntity<>(ShipperResponseDTO.from(newShipper), HttpStatus.CREATED);
-    }
-
     @GetMapping("/{id}")
     @Operation(summary = "Buscar Shipper por ID", description = "Retorna os dados de um Shipper específico, identificado pelo seu ID.")
     public ResponseEntity<ShipperResponseDTO> findById(
@@ -42,6 +33,15 @@ public class ShipperApiController {
 
         Shipper shipper = shipperService.findById(id, authUser);
         return ResponseEntity.ok(ShipperResponseDTO.from(shipper));
+    }
+
+    @PostMapping
+    @Operation(summary = "Criar um novo Shipper", description = "Recebe os dados de um Shipper e o cria no sistema.")
+    public ResponseEntity<ShipperResponseDTO> save(
+            @Valid @RequestBody CreateShipperDTO dto) {
+
+        Shipper newShipper = shipperService.create(CreateShipperDTO.toEntity(dto));
+        return new ResponseEntity<>(ShipperResponseDTO.from(newShipper), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

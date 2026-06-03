@@ -1,11 +1,15 @@
 package br.com.fiap.javaadv.VeloSpace.service.Shipper;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.ShipperType;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.NotFoundException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import br.com.fiap.javaadv.VeloSpace.model.Shipper;
+import br.com.fiap.javaadv.VeloSpace.model.UserAccount;
+import br.com.fiap.javaadv.VeloSpace.model.UserRole;
 import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
+import br.com.fiap.javaadv.VeloSpace.service.UserRole.UserRoleService;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
@@ -13,7 +17,6 @@ import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -24,17 +27,19 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
     private final UserValidationService userValidationService;
 
+    private final UserRoleService<UserRole, Long> userRoleService;
+
     private final PasswordEncoder passwordEncoder;
 
     private void validateShipperOwner(JwtUserData authUser, Shipper shipper) {
-        if (!Objects.equals(authUser.userId(), shipper.getShipperId())) {
+        if (!Objects.equals(authUser.userId(), shipper.getUserAccount().getUserAccountId())) {
             throw new ForbiddenException(
                     "Você não possui permissão para acessar este remetente.");
         }
     }
 
-    private void validateDocument(String type, String document) {
-        if ("PF".equals(type)) {
+    private void validateDocument(ShipperType type, String document) {
+        if (type.equals(ShipperType.PF)) {
             CPFValidator cpfValidator = new CPFValidator();
             cpfValidator.initialize(null);
 
@@ -47,7 +52,7 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
             return;
         }
 
-        if ("PJ".equals(type)) {
+        if (type.equals(ShipperType.PJ)) {
             CNPJValidator cnpjValidator = new CNPJValidator();
             cnpjValidator.initialize(null);
 
@@ -82,8 +87,10 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
     }
 
     @Override
-    public List<Shipper> findAll() {
-        return shipperRepository.findAll();
+    public Shipper findByUserAccountIdOrThrow(Long id) {
+        return shipperRepository.findByUserAccount_UserAccountId(id)
+                .orElseThrow(() -> new NotFoundException(
+                        "Expedidor não encontrado."));
     }
 
     @Override
@@ -94,17 +101,29 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
     }
 
     @Override
+    public Shipper findByUserAccountId(Long id, JwtUserData authUser) {
+        Shipper shipper = findByUserAccountIdOrThrow(id);
+        validateShipperOwner(authUser, shipper);
+        return shipper;
+    }
+
+    @Override
     public Shipper create(Shipper shipper) {
         validateDocument(
                 shipper.getType(),
                 shipper.getShipperDocument());
 
+        UserAccount userAccount = shipper.getUserAccount();
+
+        userValidationService.validUniqueEmail(userAccount.getEmail());
+
         validateUniqueDocument(shipper.getShipperDocument());
 
-        userValidationService.validUniqueEmail(shipper.getEmail());
+        UserRole shipperRole = userRoleService.getRequiredByCode("SHIPPER");
+        userAccount.setUserRole(shipperRole);
 
-        shipper.setHashedPassword(
-                passwordEncoder.encode(shipper.getHashedPassword()));
+        userAccount.setHashedPassword(passwordEncoder.encode(userAccount.getHashedPassword()));
+        shipper.setUserAccount(userAccount);
 
         return shipperRepository.save(shipper);
     }
@@ -115,9 +134,12 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
         validateShipperOwner(authUser, existing);
 
+        UserAccount userAccount = shipper.getUserAccount();
+        UserAccount existingUserAccount = existing.getUserAccount();
+
         if (!passwordEncoder.matches(
-                shipper.getHashedPassword(),
-                existing.getHashedPassword())) {
+                userAccount.getHashedPassword(),
+                existingUserAccount.getHashedPassword())) {
 
             throw new FieldValidationException(
                     "password",
@@ -132,15 +154,16 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
             validateUniqueDocument(shipper.getShipperDocument());
         }
 
-        if (!shipper.getEmail().equals(existing.getEmail())) {
-            userValidationService.validUniqueEmail(shipper.getEmail());
+        if (!userAccount.getEmail().equals(existingUserAccount.getEmail())) {
+            userValidationService.validUniqueEmail(userAccount.getEmail());
         }
 
         existing.setName(shipper.getName());
         existing.setShipperDocument(shipper.getShipperDocument());
-        existing.setEmail(shipper.getEmail());
-        existing.setPhone(shipper.getPhone());
         existing.setType(shipper.getType());
+
+        existingUserAccount.setEmail(userAccount.getEmail());
+        existingUserAccount.setPhone(userAccount.getPhone());
 
         return shipperRepository.save(existing);
     }
@@ -149,7 +172,6 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
     public void deleteById(Long id, JwtUserData authUser) {
         Shipper shipper = findByIdOrThrow(id);
         validateShipperOwner(authUser, shipper);
-
         shipperRepository.delete(shipper);
     }
 

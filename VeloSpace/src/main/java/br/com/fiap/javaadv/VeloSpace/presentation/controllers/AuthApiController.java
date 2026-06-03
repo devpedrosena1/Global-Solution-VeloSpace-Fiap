@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import br.com.fiap.javaadv.VeloSpace.infrastructure.security.AuthUserDetails;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtHelper;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
+import br.com.fiap.javaadv.VeloSpace.model.UserAccount;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Auth.AuthRequestDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Auth.AuthResponseDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Auth.RefreshTokenRequestDTO;
@@ -44,7 +44,7 @@ public class AuthApiController {
                         authRequestDTO.email(),
                         authRequestDTO.password()));
 
-        AuthUserDetails user = (AuthUserDetails) authentication.getPrincipal();
+        UserAccount user = (UserAccount) authentication.getPrincipal();
         String token = jwtHelper.generateToken(user);
         String refreshToken = jwtHelper.generateRefreshToken(user);
 
@@ -60,8 +60,8 @@ public class AuthApiController {
 
         if (jwtData.isPresent()) {
             JwtUserData data = jwtData.get();
-            AuthUserDetails user = AuthUserDetails.builder()
-                    .userId(data.userId())
+            UserAccount user = UserAccount.builder()
+                    .userAccountId(data.userId())
                     .email(data.email())
                     .build();
 

@@ -2,6 +2,9 @@ package br.com.fiap.javaadv.VeloSpace.presentation.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/launch-providers")
-@Tag(name = "Launch Providers", description = "Endpoints para gerenciamento de Launch Providers")
+@Tag(name = "Launch Providers API", description = "Endpoints para gerenciamento de Launch Providers")
 public class LaunchProviderApiController {
 
     private final LaunchProviderService<LaunchProvider, Long> launchProviderService;
@@ -33,6 +36,16 @@ public class LaunchProviderApiController {
 
         LaunchProvider launchProvider = launchProviderService.findById(id, authUser);
         return ResponseEntity.ok(LaunchProviderResponseDTO.from(launchProvider));
+    }
+
+    @GetMapping
+    @Operation(summary = "Listar todos os Launch Providers", description = "Retorna os dados de todos os Launch Providers cadastrados.")
+    public ResponseEntity<List<LaunchProviderResponseDTO>> findAll() {
+        List<LaunchProvider> launchProviders = launchProviderService.findAll();
+        return ResponseEntity.ok(launchProviders
+                .stream()
+                .map(LaunchProviderResponseDTO::from)
+                .toList());
     }
 
     @PostMapping

@@ -10,6 +10,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.OperatorAccessDeniedException;
+import br.com.fiap.javaadv.VeloSpace.model.repository.OperatorRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final JwtHelper jwtHelper;
+
+    private final OperatorRepository operatorRepository;
 
     @Override
     protected void doFilterInternal(
@@ -39,6 +44,18 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         if (user.isPresent()) {
             JwtUserData userData = user.get();
+
+            if (userData.role() == Role.OPERATOR) {
+                boolean approved = operatorRepository
+                        .findByUserAccount_UserAccountId(userData.userId())
+                        .map(operator -> "APPROVED".equals(operator.getOperatorStatus().getCode()))
+                        .orElse(false);
+
+                if (!approved) {
+                    throw new OperatorAccessDeniedException();
+                }
+            }
+
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userData,
                     null,
