@@ -1,16 +1,17 @@
 package br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Shipper;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.ShipperType;
 import br.com.fiap.javaadv.VeloSpace.model.Shipper;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.UserAccount.UserAccountResponseDTO;
 import lombok.Builder;
 
 @Builder
 public record ShipperResponseDTO(
         Long shipperId,
-        String type,
+        ShipperType type,
         String shipperDocument,
         String name,
-        String email,
-        Long phone) {
+        UserAccountResponseDTO userAccount) {
 
     public static ShipperResponseDTO from(Shipper shipper) {
         if (shipper == null)
@@ -21,8 +22,7 @@ public record ShipperResponseDTO(
                 .type(shipper.getType())
                 .shipperDocument(shipper.getShipperDocument())
                 .name(shipper.getName())
-                .email(shipper.getEmail())
-                .phone(shipper.getPhone())
+                .userAccount(UserAccountResponseDTO.from(shipper.getUserAccount()))
                 .build();
     }
 

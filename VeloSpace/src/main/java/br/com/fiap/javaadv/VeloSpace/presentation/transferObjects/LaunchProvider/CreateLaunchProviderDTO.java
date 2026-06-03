@@ -1,10 +1,12 @@
 package br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.LaunchProvider;
 
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
+import br.com.fiap.javaadv.VeloSpace.model.UserAccount;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,8 +32,8 @@ public class CreateLaunchProviderDTO {
     @Size(max = 255, message = "O e-mail deve ter no máximo 255 caracteres")
     private String email;
 
-    @Digits(integer = 15, fraction = 0, message = "O telefone deve conter no máximo 15 dígitos")
-    private Long phone;
+    @Pattern(regexp = "^\\d{0,15}$", message = "O telefone deve conter apenas números e no máximo 15 dígitos")
+    private String phone;
 
     @NotBlank(message = "A senha não pode estar em branco")
     @Size(min = 6, max = 255, message = "A senha deve ter entre 6 e 255 caracteres")
@@ -45,9 +47,12 @@ public class CreateLaunchProviderDTO {
         return LaunchProvider.builder()
                 .corporateName(dto.getCorporateName())
                 .cnpj(dto.getCnpj())
-                .email(dto.getEmail())
-                .phone(dto.getPhone())
-                .hashedPassword(dto.getPassword())
+                .userAccount(
+                        UserAccount.builder()
+                                .email(dto.getEmail())
+                                .hashedPassword(dto.getPassword())
+                                .phone(dto.getPhone())
+                                .build())
                 .build();
     }
 }

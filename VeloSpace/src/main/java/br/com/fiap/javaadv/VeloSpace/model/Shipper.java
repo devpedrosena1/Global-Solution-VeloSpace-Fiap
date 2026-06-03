@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import java.util.Objects;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.ShipperType;
+
 @Entity
 @Table(name = "vs_shipper")
 @NoArgsConstructor
@@ -21,30 +23,26 @@ public class Shipper {
     @Column(name = "shipper_id")
     private @Getter @Setter Long shipperId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 2)
-    private @Getter @Setter String type;
-
-    @Column(name = "name", nullable = false, length = 255)
-    private @Getter @Setter String name;
-
-    @Column(name = "email", nullable = false, unique = true, length = 255)
-    private @Getter @Setter String email;
+    private @Getter @Setter ShipperType type;
 
     @Column(name = "shipper_document", nullable = false, unique = true, length = 14)
     private @Getter @Setter String shipperDocument;
 
-    @Column(name = "phone")
-    private @Getter @Setter Long phone;
+    @Column(name = "name", nullable = false, length = 255)
+    private @Getter @Setter String name;
 
-    @Column(name = "hashed_password", nullable = false, length = 255)
-    private @Getter @Setter String hashedPassword;
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "user_account_id", nullable = false, unique = true)
+    private @Getter @Setter UserAccount userAccount;
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass())
             return false;
-        Shipper shipper = (Shipper) o;
-        return Objects.equals(shipperId, shipper.shipperId);
+        Shipper that = (Shipper) o;
+        return Objects.equals(shipperId, that.getShipperId());
     }
 
     @Override

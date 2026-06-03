@@ -1,11 +1,15 @@
 package br.com.fiap.javaadv.VeloSpace.service.LaunchProvider;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.NotFoundException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
+import br.com.fiap.javaadv.VeloSpace.model.UserAccount;
+import br.com.fiap.javaadv.VeloSpace.model.UserRole;
 import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
+import br.com.fiap.javaadv.VeloSpace.service.UserRole.UserRoleService;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,10 +26,12 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
 
     private final UserValidationService userValidationService;
 
+    private final UserRoleService<UserRole, Long> userRoleService;
+
     private final PasswordEncoder passwordEncoder;
 
     private void validateLaunchProviderOwner(JwtUserData authUser, LaunchProvider launchProvider) {
-        if (!Objects.equals(authUser.userId(), launchProvider.getLaunchProviderId())) {
+        if (!Objects.equals(authUser.userId(), launchProvider.getUserAccount().getUserAccountId())) {
             throw new ForbiddenException(
                     "Você não possui permissão para acessar esta provedora de lançamento.");
         }
@@ -52,6 +58,10 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
 
     @Override
     public LaunchProvider create(LaunchProvider launchProvider) {
+        UserAccount userAccount = launchProvider.getUserAccount();
+
+        userValidationService.validUniqueEmail(userAccount.getEmail());
+
         launchProviderRepository.findByCnpj(launchProvider.getCnpj())
                 .ifPresent(other -> {
                     throw new FieldValidationException(
@@ -59,10 +69,11 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
                             "Este CNPJ já está em uso.");
                 });
 
-        userValidationService.validUniqueEmail(launchProvider.getEmail());
+        UserRole launchProviderRole = userRoleService.getRequiredByCode(Role.LAUNCH_PROVIDER);
+        userAccount.setUserRole(launchProviderRole);
 
-        launchProvider.setHashedPassword(
-                passwordEncoder.encode(launchProvider.getHashedPassword()));
+        userAccount.setHashedPassword(passwordEncoder.encode(userAccount.getHashedPassword()));
+        launchProvider.setUserAccount(userAccount);
 
         return launchProviderRepository.save(launchProvider);
     }
@@ -73,9 +84,12 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
 
         validateLaunchProviderOwner(authUser, existing);
 
+        UserAccount userAccount = launchProvider.getUserAccount();
+        UserAccount existingUserAccount = existing.getUserAccount();
+
         if (!passwordEncoder.matches(
-                launchProvider.getHashedPassword(),
-                existing.getHashedPassword())) {
+                userAccount.getHashedPassword(),
+                existingUserAccount.getHashedPassword())) {
 
             throw new FieldValidationException(
                     "password",
@@ -91,14 +105,15 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
                     });
         }
 
-        if (!launchProvider.getEmail().equals(existing.getEmail())) {
-            userValidationService.validUniqueEmail(launchProvider.getEmail());
+        if (!userAccount.getEmail().equals(existingUserAccount.getEmail())) {
+            userValidationService.validUniqueEmail(userAccount.getEmail());
         }
 
         existing.setCorporateName(launchProvider.getCorporateName());
         existing.setCnpj(launchProvider.getCnpj());
-        existing.setPhone(launchProvider.getPhone());
-        existing.setEmail(launchProvider.getEmail());
+
+        existingUserAccount.setEmail(userAccount.getEmail());
+        existingUserAccount.setPhone(userAccount.getPhone());
 
         return launchProviderRepository.save(existing);
     }

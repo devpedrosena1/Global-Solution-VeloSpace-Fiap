@@ -1,15 +1,15 @@
 package br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.LaunchProvider;
 
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.UserAccount.UserAccountResponseDTO;
 import lombok.Builder;
 
 @Builder
 public record LaunchProviderResponseDTO(
         Long launchProviderId,
-        String corporateName,
         String cnpj,
-        String email,
-        Long phone) {
+        String corporateName,
+        UserAccountResponseDTO userAccount) {
 
     public static LaunchProviderResponseDTO from(
             LaunchProvider launchProvider) {
@@ -20,10 +20,9 @@ public record LaunchProviderResponseDTO(
 
         return LaunchProviderResponseDTO.builder()
                 .launchProviderId(launchProvider.getLaunchProviderId())
-                .corporateName(launchProvider.getCorporateName())
                 .cnpj(launchProvider.getCnpj())
-                .email(launchProvider.getEmail())
-                .phone(launchProvider.getPhone())
+                .corporateName(launchProvider.getCorporateName())
+                .userAccount(UserAccountResponseDTO.from(launchProvider.getUserAccount()))
                 .build();
     }
 

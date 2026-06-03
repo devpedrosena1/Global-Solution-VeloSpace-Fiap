@@ -48,8 +48,8 @@ public class Rocket {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass())
             return false;
-        Rocket rocket = (Rocket) o;
-        return Objects.equals(rocketId, rocket.rocketId);
+        Rocket that = (Rocket) o;
+        return Objects.equals(rocketId, that.getRocketId());
     }
 
     @Override

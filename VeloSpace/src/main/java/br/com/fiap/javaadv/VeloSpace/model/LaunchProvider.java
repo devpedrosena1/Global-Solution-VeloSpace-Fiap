@@ -27,21 +27,16 @@ public class LaunchProvider {
     @Column(name = "corporate_name", nullable = false, length = 255)
     private @Getter @Setter String corporateName;
 
-    @Column(name = "email", nullable = false, unique = true, length = 255)
-    private @Getter @Setter String email;
-
-    @Column(name = "phone")
-    private @Getter @Setter Long phone;
-
-    @Column(name = "hashed_password", nullable = false, length = 255)
-    private @Getter @Setter String hashedPassword;
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "user_account_id", nullable = false, unique = true)
+    private @Getter @Setter UserAccount userAccount;
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass())
             return false;
         LaunchProvider that = (LaunchProvider) o;
-        return Objects.equals(launchProviderId, that.launchProviderId);
+        return Objects.equals(launchProviderId, that.getLaunchProviderId());
     }
 
     @Override
