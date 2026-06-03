@@ -1,4 +1,4 @@
-package br.com.fiap.javaadv.VeloSpace.infrastructure.security;
+package br.com.fiap.javaadv.VeloSpace.infrastructure.enums;
 
 public enum Role {
     SHIPPER,

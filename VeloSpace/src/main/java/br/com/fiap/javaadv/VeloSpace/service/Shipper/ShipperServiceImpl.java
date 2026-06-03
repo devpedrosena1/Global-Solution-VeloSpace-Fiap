@@ -1,22 +1,20 @@
 package br.com.fiap.javaadv.VeloSpace.service.Shipper;
 
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
-import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
-import br.com.fiap.javaadv.VeloSpace.model.Payload;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenException;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.NotFoundException;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import br.com.fiap.javaadv.VeloSpace.model.Shipper;
-import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
-
+import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -24,116 +22,135 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
     private final ShipperRepository shipperRepository;
 
-    private final PasswordEncoder passwordEncoder;
-
-    private final PayloadRepository payloadRepository;
-
     private final UserValidationService userValidationService;
 
+    private final PasswordEncoder passwordEncoder;
+
+    private void validateShipperOwner(JwtUserData authUser, Shipper shipper) {
+        if (!Objects.equals(authUser.userId(), shipper.getShipperId())) {
+            throw new ForbiddenException(
+                    "Você não possui permissão para acessar este remetente.");
+        }
+    }
+
+    private void validateDocument(String type, String document) {
+        if ("PF".equals(type)) {
+            CPFValidator cpfValidator = new CPFValidator();
+            cpfValidator.initialize(null);
+
+            if (!cpfValidator.isValid(document, null)) {
+                throw new FieldValidationException(
+                        "shipperDocument",
+                        "CPF inválido.");
+            }
+
+            return;
+        }
+
+        if ("PJ".equals(type)) {
+            CNPJValidator cnpjValidator = new CNPJValidator();
+            cnpjValidator.initialize(null);
+
+            if (!cnpjValidator.isValid(document, null)) {
+                throw new FieldValidationException(
+                        "shipperDocument",
+                        "CNPJ inválido.");
+            }
+
+            return;
+        }
+
+        throw new FieldValidationException(
+                "type",
+                "Tipo de remetente inválido.");
+    }
+
+    private void validateUniqueDocument(String document) {
+        shipperRepository.findByShipperDocument(document)
+                .ifPresent(other -> {
+                    throw new FieldValidationException(
+                            "shipperDocument",
+                            "Este documento já está em uso.");
+                });
+    }
+
     @Override
-    public LaunchProvider findMe() {
-        // TO-DO: Podemos implementar isso depois quando tiver security (não sei como
-        // voce quer implementar ao certo)
-        throw new UnsupportedOperationException("Not implemented yet");
+    public Shipper findByIdOrThrow(Long id) {
+        return shipperRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(
+                        "Expedidor não encontrado."));
     }
 
     @Override
     public List<Shipper> findAll() {
-        return new ArrayList<>(
-                shipperRepository.findAll());
+        return shipperRepository.findAll();
     }
 
     @Override
-    public List<Payload> findPackagesByShipperId(Long id) {
-        if (!shipperRepository.existsById(id)) {
-            throw new RuntimeException("Shipper not found with id: " + id);
-        }
-        return payloadRepository.findByShipper_ShipperId(id);
-
-    }
-
-    @Override
-    public Optional<Shipper> findById(Long id) {
-        return shipperRepository.findById(id);
+    public Shipper findById(Long id, JwtUserData authUser) {
+        Shipper shipper = findByIdOrThrow(id);
+        validateShipperOwner(authUser, shipper);
+        return shipper;
     }
 
     @Override
     public Shipper create(Shipper shipper) {
+        validateDocument(
+                shipper.getType(),
+                shipper.getShipperDocument());
 
-        if (shipper.getType().equals("PF")) {
-            CPFValidator cpfValidator = new CPFValidator();
-            cpfValidator.initialize(null);
-            if (!cpfValidator.isValid(shipper.getShipperDocument(), null)) {
-                throw new FieldValidationException("shipperDocument", "Este documento é inválido.");
-            }
-        } else {
-            CNPJValidator cnpjValidator = new CNPJValidator();
-            cnpjValidator.initialize(null);
-            if (!cnpjValidator.isValid(shipper.getShipperDocument(), null)) {
-                throw new FieldValidationException("shipperDocument", "Este documento é inválido.");
-            }
-        }
-
-        shipperRepository.findByShipperDocument(shipper.getShipperDocument())
-                .ifPresent(other -> {
-                    throw new FieldValidationException("shipperDocument", "Este documento já está em uso.");
-                });
+        validateUniqueDocument(shipper.getShipperDocument());
 
         userValidationService.validUniqueEmail(shipper.getEmail());
-        shipper.setHashedPassword(passwordEncoder.encode(shipper.getHashedPassword()));
+
+        shipper.setHashedPassword(
+                passwordEncoder.encode(shipper.getHashedPassword()));
+
         return shipperRepository.save(shipper);
     }
 
     @Override
-    public Shipper updateById(Long id, Shipper shipper) {
-        return shipperRepository.findById(id)
-                .map(existingShipper -> {
-                    existingShipper.setName(shipper.getName());
-                    existingShipper.setShipperDocument(shipper.getShipperDocument());
-                    existingShipper.setEmail(shipper.getEmail());
-                    existingShipper.setPhone(shipper.getPhone());
-                    existingShipper.setHashedPassword(shipper.getHashedPassword());
-                    existingShipper.setType(shipper.getType());
-                    return shipperRepository.save(existingShipper);
-                })
-                .orElseThrow(() -> new RuntimeException("Shipper not found with id: " + id));
+    public Shipper updateById(Long id, Shipper shipper, JwtUserData authUser) {
+        Shipper existing = findByIdOrThrow(id);
+
+        validateShipperOwner(authUser, existing);
+
+        if (!passwordEncoder.matches(
+                shipper.getHashedPassword(),
+                existing.getHashedPassword())) {
+
+            throw new FieldValidationException(
+                    "password",
+                    "Senha atual incorreta.");
+        }
+
+        validateDocument(
+                shipper.getType(),
+                shipper.getShipperDocument());
+
+        if (!shipper.getShipperDocument().equals(existing.getShipperDocument())) {
+            validateUniqueDocument(shipper.getShipperDocument());
+        }
+
+        if (!shipper.getEmail().equals(existing.getEmail())) {
+            userValidationService.validUniqueEmail(shipper.getEmail());
+        }
+
+        existing.setName(shipper.getName());
+        existing.setShipperDocument(shipper.getShipperDocument());
+        existing.setEmail(shipper.getEmail());
+        existing.setPhone(shipper.getPhone());
+        existing.setType(shipper.getType());
+
+        return shipperRepository.save(existing);
     }
 
     @Override
-    public Shipper patchById(Long id, Shipper shipper) {
-        return shipperRepository.findById(id)
-                .map(existingShipper -> {
-                    if (shipper.getName() != null)
-                        existingShipper.setName(shipper.getName());
-                    if (shipper.getShipperDocument() != null)
-                        existingShipper.setShipperDocument(shipper.getShipperDocument());
-                    if (shipper.getEmail() != null)
-                        existingShipper.setEmail(shipper.getEmail());
-                    if (shipper.getPhone() != null)
-                        existingShipper.setPhone(shipper.getPhone());
-                    if (shipper.getHashedPassword() != null)
-                        existingShipper.setHashedPassword(shipper.getHashedPassword());
-                    if (shipper.getType() != null)
-                        existingShipper.setType(shipper.getType());
-                    return shipperRepository.save(existingShipper);
-                })
-                .orElseThrow(() -> new RuntimeException("Shipper not found with id: " + id));
-    }
+    public void deleteById(Long id, JwtUserData authUser) {
+        Shipper shipper = findByIdOrThrow(id);
+        validateShipperOwner(authUser, shipper);
 
-    @Override
-    public Shipper patchPasswordById(Long id, Shipper shipper) {
-        return shipperRepository.findById(id)
-                .map(existingShipper -> {
-                    if (shipper.getHashedPassword() != null)
-                        existingShipper.setHashedPassword(shipper.getHashedPassword());
-                    return shipperRepository.save(existingShipper);
-                })
-                .orElseThrow(() -> new RuntimeException("Shipper not found with id: " + id));
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        shipperRepository.deleteById(id);
+        shipperRepository.delete(shipper);
     }
 
 }

@@ -29,16 +29,16 @@ public class Payload {
     private @Getter @Setter String name;
 
     @Column(name = "height", nullable = false)
-    private @Getter @Setter int height;
+    private @Getter @Setter Integer height;
 
     @Column(name = "width", nullable = false)
-    private @Getter @Setter int width;
+    private @Getter @Setter Integer width;
 
     @Column(name = "length", nullable = false)
-    private @Getter @Setter int length;
+    private @Getter @Setter Integer length;
 
     @Column(name = "weight", nullable = false)
-    private @Getter @Setter int weight;
+    private @Getter @Setter Integer weight;
 
     @Column(name = "launch_justification", nullable = false, length = 500)
     private @Getter @Setter String launchJustification;

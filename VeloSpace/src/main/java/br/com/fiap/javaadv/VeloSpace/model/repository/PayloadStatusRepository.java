@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface PayloadStatusRepository extends JpaRepository<PayloadStatus, Long> {
 
-    Optional<PayloadStatus> findByDescription(String description);
+    Optional<PayloadStatus> findByCode(String code);
 
 }

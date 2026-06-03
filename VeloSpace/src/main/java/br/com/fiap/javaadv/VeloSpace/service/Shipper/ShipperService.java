@@ -1,30 +1,20 @@
 package br.com.fiap.javaadv.VeloSpace.service.Shipper;
 
-import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
-import br.com.fiap.javaadv.VeloSpace.model.Payload;
-import br.com.fiap.javaadv.VeloSpace.model.Shipper;
-
+import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import java.util.List;
-import java.util.Optional;
 
 public interface ShipperService<T, ID> {
 
-    LaunchProvider findMe();
+    T findByIdOrThrow(ID id);
 
-    List<Shipper> findAll(); // a ver se vamos usar mesmo, se for tem que usar paginação
+    List<T> findAll();
 
-    List<Payload> findPackagesByShipperId(ID id);
+    T findById(ID id, JwtUserData authUser);
 
-    Optional<Shipper> findById(ID id);
+    T create(T o);
 
-    Shipper create(T o);
+    T updateById(ID id, T o, JwtUserData authUser);
 
-    Shipper updateById(ID id, T o);
-
-    Shipper patchById(ID id, T o);
-
-    Shipper patchPasswordById(ID id, T o);
-
-    void deleteById(ID id);
+    void deleteById(ID id, JwtUserData authUser);
 
 }

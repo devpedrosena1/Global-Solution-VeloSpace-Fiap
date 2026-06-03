@@ -1,29 +1,21 @@
 package br.com.fiap.javaadv.VeloSpace.service.LaunchProvider;
 
-import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
-import br.com.fiap.javaadv.VeloSpace.model.Payload;
-import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
-
 import java.util.List;
+
+import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 
 public interface LaunchProviderService<T, ID> {
 
-    LaunchProvider findMe();
+    T findByIdOrThrow(ID id);
 
-    LaunchProvider findById(ID id);
+    List<T> findAll();
 
-    List<PayloadHandler> findEmployeesByLaunchProviderId(ID id);
+    T findById(ID id, JwtUserData authUser);
 
-    List<Payload> findPackagesByLaunchProviderId(ID id);
+    T create(T o);
 
-    LaunchProvider create(T o);
+    T updateById(ID id, T o, JwtUserData authUser);
 
-    LaunchProvider updateById(ID id, T o);
-
-    LaunchProvider patchById(ID id, T o);
-
-    LaunchProvider patchPasswordById(ID id, T o);
-
-    void deleteById(ID id);
+    void deleteById(ID id, JwtUserData authUser);
 
 }

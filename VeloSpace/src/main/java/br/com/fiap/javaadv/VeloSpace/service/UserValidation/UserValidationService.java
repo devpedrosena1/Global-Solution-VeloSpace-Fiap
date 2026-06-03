@@ -5,6 +5,7 @@ import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadHandlerRepository;
 import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,10 +19,9 @@ public class UserValidationService {
     private final LaunchProviderRepository launchProviderRepository;
 
     public void validUniqueEmail(String email) {
-        boolean emailAlreadyExists =
-                shipperRepository.findByEmail(email).isPresent()
-                        || payloadHandlerRepository.findByEmail(email).isPresent()
-                        || launchProviderRepository.findByEmail(email).isPresent();
+        boolean emailAlreadyExists = shipperRepository.findByEmail(email).isPresent()
+                || payloadHandlerRepository.findByEmail(email).isPresent()
+                || launchProviderRepository.findByEmail(email).isPresent();
 
         if (emailAlreadyExists) {
             throw new FieldValidationException("email", "Este e-mail já está em uso.");

@@ -11,9 +11,6 @@ import lombok.Setter;
 @Builder
 public class CreatePayloadDTO {
 
-    @NotNull(message = "O shipper não pode ser nulo")
-    private Long shipperId;
-
     @NotNull(message = "O provedor de lançamento não pode ser nulo")
     private Long launchProviderId;
 
@@ -41,24 +38,24 @@ public class CreatePayloadDTO {
     @Size(max = 500, message = "A justificativa deve ter no máximo 500 caracteres")
     private String launchJustification;
 
-    @NotNull(message = "A prioridade não pode ser nula")
-    private Long payloadPriorityId;
-
     public static Payload toEntity(CreatePayloadDTO dto) {
+
         if (dto == null) {
             return null;
         }
-        Payload payload = new Payload();
-        payload.setShipper(Shipper.builder().shipperId(dto.getShipperId()).build());
-        payload.setLaunchProvider(LaunchProvider.builder().launchProviderId(dto.getLaunchProviderId()).build());
-        payload.setName(dto.getName());
-        payload.setHeight(dto.getHeight());
-        payload.setWidth(dto.getWidth());
-        payload.setLength(dto.getLength());
-        payload.setWeight(dto.getWeight());
-        payload.setLaunchJustification(dto.getLaunchJustification());
-        payload.setPayloadStatus(PayloadStatus.builder().payloadStatusId(1L).build());
-        payload.setPayloadPriority(PayloadPriority.builder().payloadPriorityId(dto.getPayloadPriorityId()).build());
-        return payload;
+
+        return Payload.builder()
+                .launchProvider(
+                        LaunchProvider.builder()
+                                .launchProviderId(dto.getLaunchProviderId())
+                                .build())
+                .name(dto.getName())
+                .height(dto.getHeight())
+                .width(dto.getWidth())
+                .length(dto.getLength())
+                .weight(dto.getWeight())
+                .launchJustification(dto.getLaunchJustification())
+                .build();
     }
+
 }

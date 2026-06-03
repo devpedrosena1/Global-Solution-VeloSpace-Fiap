@@ -1,19 +1,18 @@
 package br.com.fiap.javaadv.VeloSpace.service.LaunchProvider;
 
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenException;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.NotFoundException;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
-import br.com.fiap.javaadv.VeloSpace.model.Payload;
-import br.com.fiap.javaadv.VeloSpace.model.PayloadHandler;
 import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
-import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadHandlerRepository;
-import br.com.fiap.javaadv.VeloSpace.model.repository.PayloadRepository;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -21,102 +20,94 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
 
     private final LaunchProviderRepository launchProviderRepository;
 
-    private final PayloadHandlerRepository payloadHandlerRepository;
-
-    private final PayloadRepository payloadRepository;
+    private final UserValidationService userValidationService;
 
     private final PasswordEncoder passwordEncoder;
 
-    private final UserValidationService userValidationService;
-
-    @Override
-    public LaunchProvider findMe() {
-        // TO-DO: Podemos implementar isso depois quando tiver security
-        throw new UnsupportedOperationException("Not implemented yet");
+    private void validateLaunchProviderOwner(JwtUserData authUser, LaunchProvider launchProvider) {
+        if (!Objects.equals(authUser.userId(), launchProvider.getLaunchProviderId())) {
+            throw new ForbiddenException(
+                    "Você não possui permissão para acessar esta provedora de lançamento.");
+        }
     }
 
     @Override
-    public LaunchProvider findById(Long id) {
+    public LaunchProvider findByIdOrThrow(Long id) {
         return launchProviderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("LaunchProvider not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException(
+                        "Provedora de lançamento não encontrada."));
     }
 
     @Override
-    public List<PayloadHandler> findEmployeesByLaunchProviderId(Long id) {
-        if (!launchProviderRepository.existsById(id)) {
-            throw new RuntimeException("LaunchProvider not found with id: " + id);
-        }
-        return payloadHandlerRepository.findByLaunchProvider_LaunchProviderId(id);
+    public List<LaunchProvider> findAll() {
+        return launchProviderRepository.findAll();
     }
 
     @Override
-    public List<Payload> findPackagesByLaunchProviderId(Long id) {
-        if (!launchProviderRepository.existsById(id)) {
-            throw new RuntimeException("LaunchProvider not found with id: " + id);
-        }
-        return payloadRepository.findByLaunchProvider_LaunchProviderId(id);
+    public LaunchProvider findById(Long id, JwtUserData authUser) {
+        LaunchProvider launchProvider = findByIdOrThrow(id);
+        validateLaunchProviderOwner(authUser, launchProvider);
+        return launchProvider;
     }
 
     @Override
     public LaunchProvider create(LaunchProvider launchProvider) {
         launchProviderRepository.findByCnpj(launchProvider.getCnpj())
                 .ifPresent(other -> {
-                    throw new FieldValidationException("cnpj", "Este CNPJ já está em uso.");
+                    throw new FieldValidationException(
+                            "cnpj",
+                            "Este CNPJ já está em uso.");
                 });
 
         userValidationService.validUniqueEmail(launchProvider.getEmail());
 
-        launchProvider.setHashedPassword(passwordEncoder.encode(launchProvider.getHashedPassword()));
+        launchProvider.setHashedPassword(
+                passwordEncoder.encode(launchProvider.getHashedPassword()));
+
         return launchProviderRepository.save(launchProvider);
     }
 
     @Override
-    public LaunchProvider updateById(Long id, LaunchProvider launchProvider) {
-        return launchProviderRepository.findById(id)
-                .map(existing -> {
-                    existing.setCorporateName(launchProvider.getCorporateName());
-                    existing.setCnpj(launchProvider.getCnpj());
-                    existing.setPhone(launchProvider.getPhone());
-                    existing.setHashedPassword(launchProvider.getHashedPassword());
-                    existing.setEmail(launchProvider.getEmail());
-                    return launchProviderRepository.save(existing);
-                })
-                .orElseThrow(() -> new RuntimeException("LaunchProvider not found with id: " + id));
+    public LaunchProvider updateById(Long id, LaunchProvider launchProvider, JwtUserData authUser) {
+        LaunchProvider existing = findByIdOrThrow(id);
+
+        validateLaunchProviderOwner(authUser, existing);
+
+        if (!passwordEncoder.matches(
+                launchProvider.getHashedPassword(),
+                existing.getHashedPassword())) {
+
+            throw new FieldValidationException(
+                    "password",
+                    "Senha atual incorreta.");
+        }
+
+        if (!launchProvider.getCnpj().equals(existing.getCnpj())) {
+            launchProviderRepository.findByCnpj(launchProvider.getCnpj())
+                    .ifPresent(other -> {
+                        throw new FieldValidationException(
+                                "cnpj",
+                                "Este CNPJ já está em uso.");
+                    });
+        }
+
+        if (!launchProvider.getEmail().equals(existing.getEmail())) {
+            userValidationService.validUniqueEmail(launchProvider.getEmail());
+        }
+
+        existing.setCorporateName(launchProvider.getCorporateName());
+        existing.setCnpj(launchProvider.getCnpj());
+        existing.setPhone(launchProvider.getPhone());
+        existing.setEmail(launchProvider.getEmail());
+
+        return launchProviderRepository.save(existing);
     }
 
     @Override
-    public LaunchProvider patchById(Long id, LaunchProvider launchProvider) {
-        return launchProviderRepository.findById(id)
-                .map(existing -> {
-                    if (launchProvider.getCorporateName() != null)
-                        existing.setCorporateName(launchProvider.getCorporateName());
-                    if (launchProvider.getCnpj() != null)
-                        existing.setCnpj(launchProvider.getCnpj());
-                    if (launchProvider.getPhone() != null)
-                        existing.setPhone(launchProvider.getPhone());
-                    if (launchProvider.getHashedPassword() != null)
-                        existing.setHashedPassword(launchProvider.getHashedPassword());
-                    if (launchProvider.getEmail() != null)
-                        existing.setEmail(launchProvider.getEmail());
-                    return launchProviderRepository.save(existing);
-                })
-                .orElseThrow(() -> new RuntimeException("LaunchProvider not found with id: " + id));
-    }
-
-    @Override
-    public LaunchProvider patchPasswordById(Long id, LaunchProvider launchProvider) {
-        return launchProviderRepository.findById(id)
-                .map(existing -> {
-                    if (launchProvider.getHashedPassword() != null)
-                        existing.setHashedPassword(launchProvider.getHashedPassword());
-                    return launchProviderRepository.save(existing);
-                })
-                .orElseThrow(() -> new RuntimeException("LaunchProvider not found with id: " + id));
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        launchProviderRepository.deleteById(id);
+    public void deleteById(Long id, JwtUserData authUser) {
+        LaunchProvider launchProvider = findByIdOrThrow(id);
+        validateLaunchProviderOwner(authUser, launchProvider);
+        launchProviderRepository.delete(launchProvider);
     }
 
 }

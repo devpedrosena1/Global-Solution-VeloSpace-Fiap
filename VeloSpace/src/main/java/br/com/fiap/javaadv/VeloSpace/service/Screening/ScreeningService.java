@@ -1,17 +1,11 @@
 package br.com.fiap.javaadv.VeloSpace.service.Screening;
 
-import br.com.fiap.javaadv.VeloSpace.model.Screening;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 
 public interface ScreeningService<T, ID> {
 
-    Screening findById(ID id);
+    T findById(ID id, JwtUserData authUser);
 
-    Screening create(T o);
-
-    Screening updateById(ID id, T o);
-
-    Screening patchById(ID id, T o);
-
-    void deleteById(ID id);
+    T create(T o, JwtUserData authUser);
 
 }
