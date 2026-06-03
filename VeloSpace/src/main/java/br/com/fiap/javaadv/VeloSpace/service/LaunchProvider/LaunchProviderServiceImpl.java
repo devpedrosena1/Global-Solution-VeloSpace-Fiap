@@ -1,5 +1,6 @@
 package br.com.fiap.javaadv.VeloSpace.service.LaunchProvider;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.NotFoundException;
@@ -68,7 +69,7 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
                             "Este CNPJ já está em uso.");
                 });
 
-        UserRole launchProviderRole = userRoleService.getRequiredByCode("LAUNCH_PROVIDER");
+        UserRole launchProviderRole = userRoleService.getRequiredByCode(Role.LAUNCH_PROVIDER);
         userAccount.setUserRole(launchProviderRole);
 
         userAccount.setHashedPassword(passwordEncoder.encode(userAccount.getHashedPassword()));

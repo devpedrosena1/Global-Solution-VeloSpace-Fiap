@@ -32,7 +32,7 @@ public class OpenApiConfig {
                         .title("VeloSpace API")
                         .version("0.1")
                         .description(
-                                "API responsável por gerenciar os recursos da plataforma VeloSpace, incluindo autenticação, usuários, remetentes, provedoras de lançamento, operadores, satélites, inspeções, foguetes e processos de lançamento."));
+                                "API responsável por gerenciar os recursos da plataforma VeloSpace, incluindo autenticação, usuários, expedidores, provedoras de lançamento, operadores, satélites, inspeções, foguetes e processos de lançamento."));
     }
 
 }

@@ -1,5 +1,6 @@
 package br.com.fiap.javaadv.VeloSpace.service.Shipper;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.ShipperType;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenException;
@@ -34,7 +35,7 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
     private void validateShipperOwner(JwtUserData authUser, Shipper shipper) {
         if (!Objects.equals(authUser.userId(), shipper.getUserAccount().getUserAccountId())) {
             throw new ForbiddenException(
-                    "Você não possui permissão para acessar este remetente.");
+                    "Você não possui permissão para acessar este expedidor.");
         }
     }
 
@@ -67,7 +68,7 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
         throw new FieldValidationException(
                 "type",
-                "Tipo de remetente inválido.");
+                "Tipo de expedidor inválido.");
     }
 
     private void validateUniqueDocument(String document) {
@@ -119,7 +120,7 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
         validateUniqueDocument(shipper.getShipperDocument());
 
-        UserRole shipperRole = userRoleService.getRequiredByCode("SHIPPER");
+        UserRole shipperRole = userRoleService.getRequiredByCode(Role.SHIPPER);
         userAccount.setUserRole(shipperRole);
 
         userAccount.setHashedPassword(passwordEncoder.encode(userAccount.getHashedPassword()));

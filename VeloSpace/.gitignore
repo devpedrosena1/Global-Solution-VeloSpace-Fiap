@@ -30,7 +30,7 @@ build/
 !**/src/test/**/build/
 
 ### Project ###
-logs/
+**/logs/
 
 ### Environment ###
-.env
+**/.env

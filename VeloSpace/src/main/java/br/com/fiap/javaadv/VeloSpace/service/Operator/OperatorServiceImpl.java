@@ -119,7 +119,7 @@ public class OperatorServiceImpl implements OperatorService<Operator, Long> {
         OperatorStatus status = operatorStatusService.getRequiredByCode("PENDING_APPROVAL");
         operator.setOperatorStatus(status);
 
-        UserRole operatorRole = userRoleService.getRequiredByCode("LAUNCH_PROVIDER");
+        UserRole operatorRole = userRoleService.getRequiredByCode(Role.OPERATOR);
         userAccount.setUserRole(operatorRole);
 
         userAccount.setHashedPassword(passwordEncoder.encode(userAccount.getHashedPassword()));

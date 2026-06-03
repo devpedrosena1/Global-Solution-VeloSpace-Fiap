@@ -14,6 +14,7 @@ public record UserAccountResponseDTO(
             return null;
 
         return UserAccountResponseDTO.builder()
+                .userAccountId(userAccount.getUserAccountId())
                 .email(userAccount.getEmail())
                 .phone(userAccount.getPhone())
                 .build();

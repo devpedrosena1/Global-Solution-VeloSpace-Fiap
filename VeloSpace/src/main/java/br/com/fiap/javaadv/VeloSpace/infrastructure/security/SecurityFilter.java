@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
-import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.OperatorAccessDeniedException;
 import br.com.fiap.javaadv.VeloSpace.model.repository.OperatorRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -42,17 +41,29 @@ public class SecurityFilter extends OncePerRequestFilter {
         String token = authHeader.substring("Bearer ".length());
         Optional<JwtUserData> user = jwtHelper.validateToken(token);
 
+        System.out.println(user);
         if (user.isPresent()) {
             JwtUserData userData = user.get();
 
             if (userData.role() == Role.OPERATOR) {
+                String path = request.getRequestURI();
+
+                boolean allowedForUnapprovedOperator = path.equals("/api/v1/operators/me") ||
+                        path.matches("/api/v1/operators/\\d+/reapply");
+
                 boolean approved = operatorRepository
                         .findByUserAccount_UserAccountId(userData.userId())
-                        .map(operator -> "APPROVED".equals(operator.getOperatorStatus().getCode()))
+                        .map(operator -> operator.getOperatorStatus().getCode().equals("APPROVED"))
                         .orElse(false);
 
-                if (!approved) {
-                    throw new OperatorAccessDeniedException();
+                if (!approved && !allowedForUnapprovedOperator) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setCharacterEncoding("UTF-8");
+                    response.setContentType("application/json");
+                    response.getWriter().write("""
+                            {"message":"Operador não aprovado"}
+                            """);
+                    return;
                 }
             }
 
