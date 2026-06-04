@@ -1,21 +1,32 @@
 package br.com.fiap.javaadv.VeloSpace.service.Satellite;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.clients.delivery.DeliveryFeignClient;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.clients.delivery.transferObjects.TrackResponseDTO;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.SatelliteSortField;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.BusinessRuleException;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.NotFoundException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
 import br.com.fiap.javaadv.VeloSpace.model.Satellite;
+import br.com.fiap.javaadv.VeloSpace.model.SatellitePriority;
 import br.com.fiap.javaadv.VeloSpace.model.Operator;
 import br.com.fiap.javaadv.VeloSpace.model.SatelliteStatus;
 import br.com.fiap.javaadv.VeloSpace.model.Shipper;
 import br.com.fiap.javaadv.VeloSpace.model.repository.SatelliteRepository;
 import br.com.fiap.javaadv.VeloSpace.service.LaunchProvider.LaunchProviderService;
 import br.com.fiap.javaadv.VeloSpace.service.Operator.OperatorService;
+import br.com.fiap.javaadv.VeloSpace.service.SatellitePriority.SatellitePriorityService;
 import br.com.fiap.javaadv.VeloSpace.service.SatelliteStatus.SatelliteStatusService;
 import br.com.fiap.javaadv.VeloSpace.service.Shipper.ShipperService;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +45,10 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
     private final LaunchProviderService<LaunchProvider, Long> launchProviderService;
 
     private final SatelliteStatusService<SatelliteStatus, Long> satelliteStatusService;
+
+    private final SatellitePriorityService<SatellitePriority, Long> satellitePriorityService;
+
+    private DeliveryFeignClient deliveryClient;
 
     private void validateShipperOwner(JwtUserData authUser, Satellite satellite) {
         Long shipperUserAccountId = satellite.getShipper().getUserAccount().getUserAccountId();
@@ -84,6 +99,38 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
         }
     }
 
+    private void changeStatus(Satellite satellite, String statusCode) {
+        SatelliteStatus status = satelliteStatusService.getRequiredByCode(statusCode);
+        satellite.setSatelliteStatus(status);
+        satelliteRepository.save(satellite);
+    }
+
+    private void changeSatellitePriority(Satellite satellite, Long satellitePriorityId) {
+        SatellitePriority priority = satellitePriorityService.findByIdOrThrow(satellitePriorityId);
+        satellite.setSatellitePriority(priority);
+        satelliteRepository.save(satellite);
+    }
+
+    private String trackSatellite(String trackingCode) {
+        TrackResponseDTO trackResponse;
+
+        try {
+            trackResponse = deliveryClient.track(trackingCode);
+        } catch (FeignException.NotFound exception) {
+            throw new FieldValidationException(
+                    "trackingCode",
+                    "Código de rastreio inválido ou não encontrado.");
+        }
+
+        if (trackResponse == null || trackResponse.status() == null) {
+            throw new FieldValidationException(
+                    "trackingCode",
+                    "Código de rastreio inválido.");
+        }
+
+        return trackResponse.status();
+    }
+
     @Override
     public Satellite findByIdOrThrow(Long id) {
         return satelliteRepository.findById(id)
@@ -95,7 +142,46 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
     public Satellite findById(Long id, JwtUserData authUser) {
         Satellite satellite = findByIdOrThrow(id);
         validateAccess(authUser, satellite);
+
         return satellite;
+    }
+
+    @Override
+    public Page<Satellite> findAllByLaunchProviderId(
+            Long launchProviderId,
+            int page,
+            int items,
+            SatelliteSortField sortBy,
+            String direction,
+            JwtUserData authUser) {
+
+        launchProviderService.findById(launchProviderId, authUser);
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy.name()).descending()
+                : Sort.by(sortBy.name()).ascending();
+
+        return satelliteRepository.findByLaunchProvider_LaunchProviderId(
+                launchProviderId, PageRequest.of(page, items, sort));
+    }
+
+    @Override
+    public Page<Satellite> findAllByShipperId(
+            Long shipperId,
+            int page,
+            int items,
+            SatelliteSortField sortBy,
+            String direction,
+            JwtUserData authUser) {
+
+        shipperService.findById(shipperId, authUser);
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy.name()).descending()
+                : Sort.by(sortBy.name()).ascending();
+
+        return satelliteRepository.findByShipper_ShipperId(
+                shipperId, PageRequest.of(page, items, sort));
     }
 
     @Override
@@ -112,6 +198,49 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
         satellite.setSatelliteStatus(status);
 
         return satelliteRepository.save(satellite);
+    }
+
+    @Override
+    public void approval(Long id, boolean approved, Long satellitePriorityId, JwtUserData authUser) {
+        Satellite satellite = findByIdOrThrow(id);
+
+        validateOperatorRelated(authUser, satellite);
+
+        validateCurrentStatus(
+                satellite,
+                "PENDING_APPROVAL",
+                "Só é possível aprovar ou reprovar um satélite que está aguardando aprovação.");
+
+        changeStatus(satellite, approved ? "AWAITING_SHIPMENT" : "REJECTED");
+
+        if (approved) {
+            if (satellitePriorityId == null) {
+                throw new FieldValidationException(
+                        "satellitePriorityId",
+                        "A prioridade do satélite é obrigatória quando ele for aprovado.");
+            }
+
+            changeSatellitePriority(satellite, satellitePriorityId);
+        }
+    }
+
+    @Override
+    public void addTrackingCode(Long id, String trackingCode, JwtUserData authUser) {
+        Satellite satellite = findByIdOrThrow(id);
+
+        validateShipperOwner(authUser, satellite);
+
+        validateCurrentStatus(
+                satellite,
+                "AWAITING_SHIPMENT",
+                "Só é possível adicionar um código de rastreio a um satélite que está aguardando envio.");
+
+        String trackStatus = trackSatellite(trackingCode);
+
+        satellite.setTrackingCode(trackingCode);
+        changeStatus(satellite, trackStatus);
+
+        satelliteRepository.save(satellite);
     }
 
     @Override
@@ -155,6 +284,18 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
                 "Não é possível excluir um satélite neste status.");
 
         satelliteRepository.delete(satellite);
+    }
+
+    @Override
+    public void updateTracking(Satellite satellite) {
+        List<String> deliveryStatusCode = List.of(
+                "AWAITING_DISPATCH", "IN_TRANSIT");
+
+        if (deliveryStatusCode.contains(satellite.getSatelliteStatus().getCode())) {
+            String trackStatus = trackSatellite(satellite.getTrackingCode());
+            changeStatus(satellite, trackStatus);
+            satelliteRepository.save(satellite);
+        }
     }
 
 }

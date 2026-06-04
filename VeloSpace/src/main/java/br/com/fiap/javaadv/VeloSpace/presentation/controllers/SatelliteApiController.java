@@ -2,8 +2,10 @@ package br.com.fiap.javaadv.VeloSpace.presentation.controllers;
 
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import br.com.fiap.javaadv.VeloSpace.model.Satellite;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Satellite.ApprovalSatelliteDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Satellite.CreateSatelliteDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Satellite.SatelliteResponseDTO;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Satellite.TrackSatelliteDTO;
 import br.com.fiap.javaadv.VeloSpace.service.Satellite.SatelliteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +31,7 @@ public class SatelliteApiController {
             @AuthenticationPrincipal JwtUserData authUser) {
 
         Satellite satellite = satelliteService.findById(id, authUser);
+        satelliteService.updateTracking(satellite);
         return ResponseEntity.ok(SatelliteResponseDTO.from(satellite));
     }
 
@@ -40,6 +43,28 @@ public class SatelliteApiController {
 
         Satellite newSatellite = satelliteService.create(CreateSatelliteDTO.toEntity(dto), authUser);
         return new ResponseEntity<>(SatelliteResponseDTO.from(newSatellite), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{id}/approval")
+    @Operation(summary = "Aprovar Satellite por ID", description = "Altera o status de aprovação do Satellite identificado pelo ID informado. Recebe flag de aprovação e o ID de prioridade; requer autenticação e validação de permissões.")
+    public ResponseEntity<Void> approval(
+            @PathVariable Long id,
+            @Valid @RequestBody ApprovalSatelliteDTO dto,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        satelliteService.approval(id, dto.approval(), dto.satellitePriorityId(), authUser);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/track")
+    @Operation(summary = "Adicionar código de rastreamento", description = "Adiciona um código de rastreamento ao Satellite identificado pelo ID.")
+    public ResponseEntity<Void> tracking(
+            @PathVariable Long id,
+            @Valid @RequestBody TrackSatelliteDTO dto,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        satelliteService.addTrackingCode(id, dto.trackingCode(), authUser);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
