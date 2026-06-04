@@ -148,20 +148,40 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
 
     @Override
     public Page<Satellite> findAllByLaunchProviderId(
-            Long id,
+            Long launchProviderId,
             int page,
             int items,
             SatelliteSortField sortBy,
             String direction,
             JwtUserData authUser) {
 
-        launchProviderService.findById(id, authUser);
+        launchProviderService.findById(launchProviderId, authUser);
 
         Sort sort = direction.equalsIgnoreCase("desc")
                 ? Sort.by(sortBy.name()).descending()
                 : Sort.by(sortBy.name()).ascending();
 
-        return satelliteRepository.findByLaunchProvider_LaunchProviderId(id, PageRequest.of(page, items, sort));
+        return satelliteRepository.findByLaunchProvider_LaunchProviderId(
+                launchProviderId, PageRequest.of(page, items, sort));
+    }
+
+    @Override
+    public Page<Satellite> findAllByShipperId(
+            Long shipperId,
+            int page,
+            int items,
+            SatelliteSortField sortBy,
+            String direction,
+            JwtUserData authUser) {
+
+        shipperService.findById(shipperId, authUser);
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy.name()).descending()
+                : Sort.by(sortBy.name()).ascending();
+
+        return satelliteRepository.findByShipper_ShipperId(
+                shipperId, PageRequest.of(page, items, sort));
     }
 
     @Override

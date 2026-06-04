@@ -170,6 +170,27 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
     }
 
     @Override
+    public void updatePasswordById(Long id, String currentPassword, String newPassword, JwtUserData authUser) {
+        Shipper existing = findByIdOrThrow(id);
+
+        validateShipperOwner(authUser, existing);
+
+        UserAccount existingUserAccount = existing.getUserAccount();
+
+        if (!passwordEncoder.matches(
+                currentPassword,
+                existingUserAccount.getHashedPassword())) {
+
+            throw new FieldValidationException(
+                    "current_password",
+                    "Senha atual incorreta.");
+        }
+
+        existingUserAccount.setHashedPassword(passwordEncoder.encode(newPassword));
+        shipperRepository.save(existing);
+    }
+
+    @Override
     public void deleteById(Long id, JwtUserData authUser) {
         Shipper shipper = findByIdOrThrow(id);
         validateShipperOwner(authUser, shipper);

@@ -16,6 +16,8 @@ public interface ShipperService<T, ID> {
 
     T updateById(ID id, T o, JwtUserData authUser);
 
+    void updatePasswordById(ID id, String currentPassword, String newPassword, JwtUserData authUser);
+
     void deleteById(ID id, JwtUserData authUser);
 
 }

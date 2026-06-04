@@ -16,4 +16,6 @@ public interface SatelliteRepository extends JpaRepository<Satellite, Long> {
 
     Page<Satellite> findByLaunchProvider_LaunchProviderId(Long launchProviderId, Pageable pageable);
 
+    Page<Satellite> findByShipper_ShipperId(Long shipperId, Pageable pageable);
+
 }

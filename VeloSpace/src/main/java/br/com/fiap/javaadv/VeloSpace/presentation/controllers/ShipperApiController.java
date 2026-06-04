@@ -2,15 +2,23 @@ package br.com.fiap.javaadv.VeloSpace.presentation.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.SatelliteSortField;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
+import br.com.fiap.javaadv.VeloSpace.model.Satellite;
 import br.com.fiap.javaadv.VeloSpace.model.Shipper;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PageResponseDTO;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Satellite.SatelliteItemResponseDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Shipper.CreateShipperDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Shipper.ShipperResponseDTO;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.UserAccount.ChangePasswordDTO;
+import br.com.fiap.javaadv.VeloSpace.service.Satellite.SatelliteService;
 import br.com.fiap.javaadv.VeloSpace.service.Shipper.ShipperService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +33,18 @@ public class ShipperApiController {
 
     private final ShipperService<Shipper, Long> shipperService;
 
+    private final SatelliteService<Satellite, Long> satelliteService;
+
+    @GetMapping("/me")
+    @Operation(summary = "", description = "")
+    public ResponseEntity<ShipperResponseDTO> findByMe(
+            @PathVariable Long id,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        Shipper shipper = shipperService.findById(authUser.userId(), authUser);
+        return ResponseEntity.ok(ShipperResponseDTO.from(shipper));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Buscar Shipper por ID", description = "Retorna os dados de um Shipper específico, identificado pelo seu ID.")
     public ResponseEntity<ShipperResponseDTO> findById(
@@ -33,6 +53,22 @@ public class ShipperApiController {
 
         Shipper shipper = shipperService.findById(id, authUser);
         return ResponseEntity.ok(ShipperResponseDTO.from(shipper));
+    }
+
+    @GetMapping("/{id}/satellites")
+    @Operation(summary = "", description = "")
+    public ResponseEntity<PageResponseDTO<SatelliteItemResponseDTO>> findAllShipperSatellites(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int items,
+            @RequestParam(defaultValue = "operatorId") SatelliteSortField sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        Page<Satellite> satellites = satelliteService.findAllByShipperId(
+                id, page, items, sortBy, direction, authUser);
+        return ResponseEntity.ok(PageResponseDTO.from(
+                satellites.map(SatelliteItemResponseDTO::from)));
     }
 
     @PostMapping
@@ -53,6 +89,17 @@ public class ShipperApiController {
 
         Shipper updated = shipperService.updateById(id, CreateShipperDTO.toEntity(dto), authUser);
         return ResponseEntity.ok(ShipperResponseDTO.from(updated));
+    }
+
+    @PatchMapping("/{id}/password")
+    @Operation(summary = "", description = "")
+    public ResponseEntity<Void> updateById(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangePasswordDTO dto,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        shipperService.updatePasswordById(id, dto.getCurrentPassword(), dto.getNewPassword(), authUser);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

@@ -12,7 +12,14 @@ public interface SatelliteService<T, ID> {
     T findById(ID id, JwtUserData authUser);
 
     Page<T> findAllByLaunchProviderId(
-            ID id, int page, int items, SatelliteSortField sortBy, String direction, JwtUserData authUser);
+            Long launchProviderId,
+            int page, int items, SatelliteSortField sortBy, String direction,
+            JwtUserData authUser);
+
+    Page<T> findAllByShipperId(
+            Long shipperId,
+            int page, int items, SatelliteSortField sortBy, String direction,
+            JwtUserData authUser);
 
     T create(T o, JwtUserData authUser);
 

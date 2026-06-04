@@ -103,10 +103,10 @@ public class LaunchProviderApiController {
             @RequestParam(defaultValue = "asc") String direction,
             @AuthenticationPrincipal JwtUserData authUser) {
 
-        Page<Satellite> operators = satelliteService.findAllByLaunchProviderId(
+        Page<Satellite> satellites = satelliteService.findAllByLaunchProviderId(
                 id, page, items, sortBy, direction, authUser);
         return ResponseEntity.ok(PageResponseDTO.from(
-                operators.map(SatelliteItemResponseDTO::from)));
+                satellites.map(SatelliteItemResponseDTO::from)));
     }
 
     @PostMapping
@@ -125,7 +125,8 @@ public class LaunchProviderApiController {
             @Valid @RequestBody CreateLaunchProviderDTO dto,
             @AuthenticationPrincipal JwtUserData authUser) {
 
-        LaunchProvider updated = launchProviderService.updateById(id, CreateLaunchProviderDTO.toEntity(dto), authUser);
+        LaunchProvider updated = launchProviderService.updateById(id, CreateLaunchProviderDTO.toEntity(dto),
+                authUser);
         return ResponseEntity.ok(LaunchProviderResponseDTO.from(updated));
     }
 
