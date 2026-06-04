@@ -90,7 +90,7 @@ public class OperatorApiController {
 
     @PatchMapping("/{id}/password")
     @Operation(summary = "", description = "")
-    public ResponseEntity<Void> updateById(
+    public ResponseEntity<Void> updatePasswordById(
             @PathVariable Long id,
             @Valid @RequestBody ChangePasswordDTO dto,
             @AuthenticationPrincipal JwtUserData authUser) {
