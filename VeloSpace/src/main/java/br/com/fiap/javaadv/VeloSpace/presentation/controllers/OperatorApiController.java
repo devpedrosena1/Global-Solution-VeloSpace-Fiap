@@ -12,6 +12,7 @@ import br.com.fiap.javaadv.VeloSpace.model.Operator;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Operator.ApprovalOperatorDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Operator.CreateOperatorDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Operator.OperatorResponseDTO;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.UserAccount.ChangePasswordDTO;
 import br.com.fiap.javaadv.VeloSpace.service.Operator.OperatorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,16 @@ import lombok.extern.slf4j.Slf4j;
 public class OperatorApiController {
 
     private final OperatorService<Operator, Long> operatorService;
+
+    @GetMapping("/me")
+    @Operation(summary = "", description = "")
+    public ResponseEntity<OperatorResponseDTO> findByMe(
+            @PathVariable Long id,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        Operator operator = operatorService.findById(authUser.userId(), authUser);
+        return ResponseEntity.ok(OperatorResponseDTO.from(operator));
+    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar Operator por ID", description = "Retorna os dados de um Operator específico, identificado pelo seu ID.")
@@ -75,6 +86,17 @@ public class OperatorApiController {
 
         Operator updated = operatorService.updateById(id, CreateOperatorDTO.toEntity(dto), authUser);
         return ResponseEntity.ok(OperatorResponseDTO.from(updated));
+    }
+
+    @PatchMapping("/{id}/password")
+    @Operation(summary = "", description = "")
+    public ResponseEntity<Void> updateById(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangePasswordDTO dto,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        operatorService.updatePasswordById(id, dto.getCurrentPassword(), dto.getNewPassword(), authUser);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

@@ -196,6 +196,27 @@ public class OperatorServiceImpl implements OperatorService<Operator, Long> {
     }
 
     @Override
+    public void updatePasswordById(Long id, String currentPassword, String newPassword, JwtUserData authUser) {
+        Operator existing = findByIdOrThrow(id);
+
+        validateOperatorOwner(authUser, existing);
+
+        UserAccount existingUserAccount = existing.getUserAccount();
+
+        if (!passwordEncoder.matches(
+                currentPassword,
+                existingUserAccount.getHashedPassword())) {
+
+            throw new FieldValidationException(
+                    "current_password",
+                    "Senha atual incorreta.");
+        }
+
+        existingUserAccount.setHashedPassword(passwordEncoder.encode(newPassword));
+        operatorRepository.save(existing);
+    }
+
+    @Override
     public void deleteById(Long id, JwtUserData authUser) {
         Operator operator = findByIdOrThrow(id);
         validateOperatorOwner(authUser, operator);
