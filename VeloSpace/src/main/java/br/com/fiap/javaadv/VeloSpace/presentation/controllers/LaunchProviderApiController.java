@@ -44,7 +44,7 @@ public class LaunchProviderApiController {
     private final SatelliteService<Satellite, Long> satelliteService;
 
     @GetMapping("/me")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Buscar meu Launch Provider", description = "Retorna os dados do Launch Provider vinculado ao usuário autenticado.")
     public ResponseEntity<LaunchProviderResponseDTO> findByMe(
             @PathVariable Long id,
             @AuthenticationPrincipal JwtUserData authUser) {
@@ -78,7 +78,7 @@ public class LaunchProviderApiController {
     }
 
     @GetMapping("/{id}/operators")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Listar operadores do Launch Provider", description = "Retorna uma página com os operadores vinculados ao Launch Provider identificado pelo ID.")
     public ResponseEntity<PageResponseDTO<OperatorItemResponseDTO>> findAllLaunchProviderOperators(
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
@@ -94,7 +94,7 @@ public class LaunchProviderApiController {
     }
 
     @GetMapping("/{id}/satellites")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Listar satélites do Launch Provider", description = "Retorna uma página com os satélites associados ao Launch Provider informado pelo ID.")
     public ResponseEntity<PageResponseDTO<SatelliteItemResponseDTO>> findAllLaunchProviderSatellites(
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
@@ -131,7 +131,7 @@ public class LaunchProviderApiController {
     }
 
     @PatchMapping("/{id}/password")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Atualizar a senha por ID", description = "Recebe o ID do Launch Provider e atualiza a senha.")
     public ResponseEntity<Void> updateById(
             @PathVariable Long id,
             @Valid @RequestBody ChangePasswordDTO dto,
