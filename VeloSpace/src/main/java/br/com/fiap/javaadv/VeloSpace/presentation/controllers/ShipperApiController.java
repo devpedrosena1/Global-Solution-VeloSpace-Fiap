@@ -40,7 +40,7 @@ public class ShipperApiController {
     private final SatelliteService<Satellite, Long> satelliteService;
 
     @GetMapping("/me")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Buscar Shipper do usuário", description = "Retorna informações completas do Shipper vinculado ao usuário autenticado.")
     public ResponseEntity<ShipperResponseDTO> findByMe(
             @AuthenticationPrincipal JwtUserData authUser) {
 
@@ -59,7 +59,7 @@ public class ShipperApiController {
     }
 
     @GetMapping("/hateoas/{id}")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Buscar Shipper com HATEOAS", description = "Retorna o Shipper por ID com links HATEOAS. Respostas: 200 OK (dados e links), 401 Não autenticado, 403 Acesso negado, 404 Shipper não encontrado.")
     public EntityModel<ShipperResponseDTO> findByIdHateoas(
             @PathVariable Long id,
             @AuthenticationPrincipal JwtUserData authUser) {
@@ -92,7 +92,7 @@ public class ShipperApiController {
     }
 
     @GetMapping("/{id}/satellites")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Listar satellites do Shipper", description = "Retorna uma página com os satellites associados ao Shipper identificado pelo ID.")
     public ResponseEntity<PageResponseDTO<SatelliteItemResponseDTO>> findAllShipperSatellites(
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
@@ -128,7 +128,7 @@ public class ShipperApiController {
     }
 
     @PatchMapping("/{id}/password")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Atualizar senha do Shipper", description = "Atualiza a senha do Shipper identificado pelo ID.")
     public ResponseEntity<Void> updatePasswordById(
             @PathVariable Long id,
             @Valid @RequestBody ChangePasswordDTO dto,
