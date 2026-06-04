@@ -1,5 +1,6 @@
 package br.com.fiap.javaadv.VeloSpace.service.Operator;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.OperatorSortField;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.BusinessRuleException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
@@ -17,6 +18,10 @@ import br.com.fiap.javaadv.VeloSpace.service.OperatorStatus.OperatorStatusServic
 import br.com.fiap.javaadv.VeloSpace.service.UserRole.UserRoleService;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -99,6 +104,24 @@ public class OperatorServiceImpl implements OperatorService<Operator, Long> {
         Operator operator = findByIdOrThrow(id);
         validateAccess(authUser, operator);
         return operator;
+    }
+
+    @Override
+    public Page<Operator> findAllByLaunchProviderId(
+            Long id,
+            int page,
+            int items,
+            OperatorSortField sortBy,
+            String direction,
+            JwtUserData authUser) {
+
+        launchProviderService.findById(id, authUser);
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy.name()).descending()
+                : Sort.by(sortBy.name()).ascending();
+
+        return operatorRepository.findByLaunchProvider_LaunchProviderId(id, PageRequest.of(page, items, sort));
     }
 
     @Override

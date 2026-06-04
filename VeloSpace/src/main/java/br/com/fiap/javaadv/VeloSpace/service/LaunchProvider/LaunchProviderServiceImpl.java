@@ -1,5 +1,6 @@
 package br.com.fiap.javaadv.VeloSpace.service.LaunchProvider;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.LaunchProviderSortField;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenException;
@@ -12,10 +13,13 @@ import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
 import br.com.fiap.javaadv.VeloSpace.service.UserRole.UserRoleService;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -45,8 +49,12 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
     }
 
     @Override
-    public List<LaunchProvider> findAll() {
-        return launchProviderRepository.findAll();
+    public Page<LaunchProvider> findAll(int page, int items, LaunchProviderSortField sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy.name()).descending()
+                : Sort.by(sortBy.name()).ascending();
+
+        return launchProviderRepository.findAll(PageRequest.of(page, items, sort));
     }
 
     @Override
@@ -116,6 +124,27 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
         existingUserAccount.setPhone(userAccount.getPhone());
 
         return launchProviderRepository.save(existing);
+    }
+
+    @Override
+    public void updatePasswordById(Long id, String currentPassword, String newPassword, JwtUserData authUser) {
+        LaunchProvider existing = findByIdOrThrow(id);
+
+        validateLaunchProviderOwner(authUser, existing);
+
+        UserAccount existingUserAccount = existing.getUserAccount();
+
+        if (!passwordEncoder.matches(
+                currentPassword,
+                existingUserAccount.getHashedPassword())) {
+
+            throw new FieldValidationException(
+                    "current_password",
+                    "Senha atual incorreta.");
+        }
+
+        existingUserAccount.setHashedPassword(passwordEncoder.encode(newPassword));
+        launchProviderRepository.save(existing);
     }
 
     @Override

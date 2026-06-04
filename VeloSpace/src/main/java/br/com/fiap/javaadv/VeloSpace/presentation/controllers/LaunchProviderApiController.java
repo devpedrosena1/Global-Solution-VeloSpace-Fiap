@@ -3,18 +3,29 @@ package br.com.fiap.javaadv.VeloSpace.presentation.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.LaunchProviderSortField;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.OperatorSortField;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.SatelliteSortField;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
+import br.com.fiap.javaadv.VeloSpace.model.Operator;
+import br.com.fiap.javaadv.VeloSpace.model.Satellite;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.PageResponseDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.LaunchProvider.CreateLaunchProviderDTO;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.LaunchProvider.LaunchProviderItemResponseDTO;
 import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.LaunchProvider.LaunchProviderResponseDTO;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Operator.OperatorItemResponseDTO;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Satellite.SatelliteItemResponseDTO;
+import br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.UserAccount.ChangePasswordDTO;
 import br.com.fiap.javaadv.VeloSpace.service.LaunchProvider.LaunchProviderService;
+import br.com.fiap.javaadv.VeloSpace.service.Operator.OperatorService;
+import br.com.fiap.javaadv.VeloSpace.service.Satellite.SatelliteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +39,20 @@ public class LaunchProviderApiController {
 
     private final LaunchProviderService<LaunchProvider, Long> launchProviderService;
 
+    private final OperatorService<Operator, Long> operatorService;
+
+    private final SatelliteService<Satellite, Long> satelliteService;
+
+    @GetMapping("/me")
+    @Operation(summary = "", description = "")
+    public ResponseEntity<LaunchProviderResponseDTO> findByMe(
+            @PathVariable Long id,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        LaunchProvider launchProvider = launchProviderService.findById(authUser.userId(), authUser);
+        return ResponseEntity.ok(LaunchProviderResponseDTO.from(launchProvider));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Buscar Launch Provider por ID", description = "Retorna os dados de um Launch Provider específico, identificado pelo seu ID.")
     public ResponseEntity<LaunchProviderResponseDTO> findById(
@@ -40,12 +65,48 @@ public class LaunchProviderApiController {
 
     @GetMapping
     @Operation(summary = "Listar todos os Launch Providers", description = "Retorna os dados de todos os Launch Providers cadastrados.")
-    public ResponseEntity<List<LaunchProviderResponseDTO>> findAll() {
-        List<LaunchProvider> launchProviders = launchProviderService.findAll();
-        return ResponseEntity.ok(launchProviders
-                .stream()
-                .map(LaunchProviderResponseDTO::from)
-                .toList());
+    public ResponseEntity<PageResponseDTO<LaunchProviderItemResponseDTO>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int items,
+            @RequestParam(defaultValue = "launchProviderId") LaunchProviderSortField sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        Page<LaunchProvider> launchProviders = launchProviderService.findAll(
+                page, items, sortBy, direction);
+        return ResponseEntity.ok(PageResponseDTO.from(
+                launchProviders.map(LaunchProviderItemResponseDTO::from)));
+    }
+
+    @GetMapping("/{id}/operators")
+    @Operation(summary = "", description = "")
+    public ResponseEntity<PageResponseDTO<OperatorItemResponseDTO>> findAllLaunchProviderOperators(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int items,
+            @RequestParam(defaultValue = "operatorId") OperatorSortField sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        Page<Operator> operators = operatorService.findAllByLaunchProviderId(
+                id, page, items, sortBy, direction, authUser);
+        return ResponseEntity.ok(PageResponseDTO.from(
+                operators.map(OperatorItemResponseDTO::from)));
+    }
+
+    @GetMapping("/{id}/satellites")
+    @Operation(summary = "", description = "")
+    public ResponseEntity<PageResponseDTO<SatelliteItemResponseDTO>> findAllLaunchProviderSatellites(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int items,
+            @RequestParam(defaultValue = "operatorId") SatelliteSortField sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        Page<Satellite> operators = satelliteService.findAllByLaunchProviderId(
+                id, page, items, sortBy, direction, authUser);
+        return ResponseEntity.ok(PageResponseDTO.from(
+                operators.map(SatelliteItemResponseDTO::from)));
     }
 
     @PostMapping
@@ -66,6 +127,17 @@ public class LaunchProviderApiController {
 
         LaunchProvider updated = launchProviderService.updateById(id, CreateLaunchProviderDTO.toEntity(dto), authUser);
         return ResponseEntity.ok(LaunchProviderResponseDTO.from(updated));
+    }
+
+    @PatchMapping("/{id}/password")
+    @Operation(summary = "", description = "")
+    public ResponseEntity<Void> updateById(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangePasswordDTO dto,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        launchProviderService.updatePasswordById(id, dto.getCurrentPassword(), dto.getNewPassword(), authUser);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

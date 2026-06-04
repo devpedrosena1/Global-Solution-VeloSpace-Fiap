@@ -1,6 +1,7 @@
 package br.com.fiap.javaadv.VeloSpace.service.Satellite;
 
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
+import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.SatelliteSortField;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.BusinessRuleException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.NotFoundException;
@@ -16,6 +17,10 @@ import br.com.fiap.javaadv.VeloSpace.service.Operator.OperatorService;
 import br.com.fiap.javaadv.VeloSpace.service.SatelliteStatus.SatelliteStatusService;
 import br.com.fiap.javaadv.VeloSpace.service.Shipper.ShipperService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -96,6 +101,24 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
         Satellite satellite = findByIdOrThrow(id);
         validateAccess(authUser, satellite);
         return satellite;
+    }
+
+    @Override
+    public Page<Satellite> findAllByLaunchProviderId(
+            Long id,
+            int page,
+            int items,
+            SatelliteSortField sortBy,
+            String direction,
+            JwtUserData authUser) {
+
+        launchProviderService.findById(id, authUser);
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy.name()).descending()
+                : Sort.by(sortBy.name()).ascending();
+
+        return satelliteRepository.findByLaunchProvider_LaunchProviderId(id, PageRequest.of(page, items, sort));
     }
 
     @Override
