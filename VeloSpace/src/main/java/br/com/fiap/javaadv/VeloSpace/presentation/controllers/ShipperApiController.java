@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +25,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -38,7 +42,6 @@ public class ShipperApiController {
     @GetMapping("/me")
     @Operation(summary = "", description = "")
     public ResponseEntity<ShipperResponseDTO> findByMe(
-            @PathVariable Long id,
             @AuthenticationPrincipal JwtUserData authUser) {
 
         Shipper shipper = shipperService.findById(authUser.userId(), authUser);
@@ -53,6 +56,39 @@ public class ShipperApiController {
 
         Shipper shipper = shipperService.findById(id, authUser);
         return ResponseEntity.ok(ShipperResponseDTO.from(shipper));
+    }
+
+    @GetMapping("/hateoas/{id}")
+    @Operation(summary = "", description = "")
+    public EntityModel<ShipperResponseDTO> findByIdHateoas(
+            @PathVariable Long id,
+            @AuthenticationPrincipal JwtUserData authUser) {
+
+        Shipper shipper = shipperService.findById(id, authUser);
+        return EntityModel.of(
+                ShipperResponseDTO.from(shipper),
+
+                linkTo(methodOn(ShipperApiController.class)
+                        .findByIdHateoas(id, null)).withSelfRel(),
+
+                linkTo(methodOn(ShipperApiController.class)
+                        .findById(id, null)).withRel("shipper"),
+
+                linkTo(methodOn(ShipperApiController.class)
+                        .findByMe(null)).withRel("me"),
+
+                linkTo(methodOn(ShipperApiController.class)
+                        .findAllShipperSatellites(
+                                id,
+                                0, 10, SatelliteSortField.satelliteId, "asc",
+                                null))
+                        .withRel("satellites"),
+
+                linkTo(methodOn(ShipperApiController.class)
+                        .updateById(id, null, null)).withRel("update"),
+
+                linkTo(methodOn(ShipperApiController.class)
+                        .deleteById(id, null)).withRel("delete"));
     }
 
     @GetMapping("/{id}/satellites")
@@ -93,7 +129,7 @@ public class ShipperApiController {
 
     @PatchMapping("/{id}/password")
     @Operation(summary = "", description = "")
-    public ResponseEntity<Void> updateById(
+    public ResponseEntity<Void> updatePasswordById(
             @PathVariable Long id,
             @Valid @RequestBody ChangePasswordDTO dto,
             @AuthenticationPrincipal JwtUserData authUser) {
