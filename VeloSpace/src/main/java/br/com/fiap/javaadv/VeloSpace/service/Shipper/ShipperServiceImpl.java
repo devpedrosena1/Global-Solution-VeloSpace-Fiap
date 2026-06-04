@@ -1,5 +1,12 @@
 package br.com.fiap.javaadv.VeloSpace.service.Shipper;
 
+import java.util.Objects;
+
+import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.ShipperType;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
@@ -13,12 +20,6 @@ import br.com.fiap.javaadv.VeloSpace.model.repository.ShipperRepository;
 import br.com.fiap.javaadv.VeloSpace.service.UserRole.UserRoleService;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -55,9 +56,10 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
 
         if (type.equals(ShipperType.PJ)) {
             CNPJValidator cnpjValidator = new CNPJValidator();
-            cnpjValidator.initialize(null);
 
-            if (!cnpjValidator.isValid(document, null)) {
+            try {
+                cnpjValidator.assertValid(document);
+            } catch (Exception e) {
                 throw new FieldValidationException(
                         "shipperDocument",
                         "CNPJ inválido.");
