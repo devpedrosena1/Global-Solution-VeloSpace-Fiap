@@ -1,5 +1,6 @@
 package br.com.fiap.javaadv.VeloSpace.service.SatellitePriority;
 
+import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.NotFoundException;
 import br.com.fiap.javaadv.VeloSpace.model.SatellitePriority;
 import br.com.fiap.javaadv.VeloSpace.model.repository.SatellitePriorityRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,13 @@ public class SatellitePriorityServiceImpl implements SatellitePriorityService<Sa
     @Override
     public List<SatellitePriority> findAll() {
         return satellitePriorityRepository.findAll();
+    }
+
+    @Override
+    public SatellitePriority findByIdOrThrow(Long id) {
+        return satellitePriorityRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(
+                        "Prioridade de satélite não encontrada."));
     }
 
 }

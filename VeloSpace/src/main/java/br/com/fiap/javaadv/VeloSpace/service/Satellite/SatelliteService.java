@@ -20,4 +20,10 @@ public interface SatelliteService<T, ID> {
 
     void deleteById(ID id, JwtUserData authUser);
 
+    void approval(ID id, boolean approval, ID satellitePriorityId, JwtUserData authUser);
+
+    void addTrackingCode(ID id, String trackingCode, JwtUserData authUser);
+
+    void updateTracking(T o);
+
 }

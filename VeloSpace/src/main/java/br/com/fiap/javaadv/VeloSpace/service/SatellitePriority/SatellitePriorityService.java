@@ -6,4 +6,6 @@ public interface SatellitePriorityService<T, ID> {
 
     List<T> findAll();
 
+    T findByIdOrThrow(ID id);
+
 }
