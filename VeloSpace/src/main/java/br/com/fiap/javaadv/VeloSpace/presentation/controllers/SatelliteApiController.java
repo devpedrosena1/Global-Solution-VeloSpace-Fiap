@@ -46,7 +46,7 @@ public class SatelliteApiController {
     }
 
     @PostMapping("/{id}/approval")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Aprovar Satellite por ID", description = "Altera o status de aprovação do Satellite identificado pelo ID informado. Recebe flag de aprovação e o ID de prioridade; requer autenticação e validação de permissões.")
     public ResponseEntity<Void> approval(
             @PathVariable Long id,
             @Valid @RequestBody ApprovalSatelliteDTO dto,
@@ -57,7 +57,7 @@ public class SatelliteApiController {
     }
 
     @PostMapping("/{id}/track")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Adicionar código de rastreamento", description = "Adiciona um código de rastreamento ao Satellite identificado pelo ID.")
     public ResponseEntity<Void> tracking(
             @PathVariable Long id,
             @Valid @RequestBody TrackSatelliteDTO dto,

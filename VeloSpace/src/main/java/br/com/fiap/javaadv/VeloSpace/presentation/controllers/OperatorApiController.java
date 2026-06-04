@@ -28,7 +28,7 @@ public class OperatorApiController {
     private final OperatorService<Operator, Long> operatorService;
 
     @GetMapping("/me")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Buscar meu Operator", description = "Retorna os dados do Operator associado ao usuário autenticado.")
     public ResponseEntity<OperatorResponseDTO> findByMe(
             @PathVariable Long id,
             @AuthenticationPrincipal JwtUserData authUser) {
@@ -89,7 +89,7 @@ public class OperatorApiController {
     }
 
     @PatchMapping("/{id}/password")
-    @Operation(summary = "", description = "")
+    @Operation(summary = "Atualizar senha do Operator", description = "Atualiza a senha do Operator identificado pelo ID.")
     public ResponseEntity<Void> updatePasswordById(
             @PathVariable Long id,
             @Valid @RequestBody ChangePasswordDTO dto,
