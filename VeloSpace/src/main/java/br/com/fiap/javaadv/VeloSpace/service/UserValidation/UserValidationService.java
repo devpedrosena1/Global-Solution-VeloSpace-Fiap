@@ -13,8 +13,9 @@ public class UserValidationService {
     private final UserAccountRepository userAccountRepository;
 
     public void validUniqueEmail(String email) {
-        userAccountRepository.findByEmail(email)
-                .orElseThrow(() -> new FieldValidationException("email", "Este e-mail já está em uso."));
+        if (userAccountRepository.existsByEmail(email)) {
+            new FieldValidationException("email", "Este e-mail já está em uso.");
+        }
     }
 
 }
