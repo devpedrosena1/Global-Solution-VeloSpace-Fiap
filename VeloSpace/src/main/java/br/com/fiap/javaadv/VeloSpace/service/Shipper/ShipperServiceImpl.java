@@ -2,10 +2,10 @@ package br.com.fiap.javaadv.VeloSpace.service.Shipper;
 
 import java.util.Objects;
 
-import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import br.com.caelum.stella.validation.CPFValidator;
 import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.Role;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.ShipperType;
@@ -43,12 +43,13 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
     private void validateDocument(ShipperType type, String document) {
         if (type.equals(ShipperType.PF)) {
             CPFValidator cpfValidator = new CPFValidator();
-            cpfValidator.initialize(null);
 
-            if (!cpfValidator.isValid(document, null)) {
+            try {
+                cpfValidator.assertValid(document);
+            } catch (Exception e) {
                 throw new FieldValidationException(
                         "shipperDocument",
-                        "CPF inválido.");
+                        "CNPJ inválido");
             }
 
             return;
@@ -62,7 +63,7 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
             } catch (Exception e) {
                 throw new FieldValidationException(
                         "shipperDocument",
-                        "CNPJ inválido.");
+                        "CNPJ inválido");
             }
 
             return;

@@ -24,7 +24,7 @@ public class CreateOperatorDTO {
 
     @NotNull(message = "O CPF não pode ser nulo")
     @Digits(integer = 11, fraction = 0, message = "O CPF deve conter no máximo 11 dígitos")
-    @CPF
+    @CPF(message = "CPF inválido")
     private String cpf;
 
     @NotBlank(message = "O nome não pode estar em branco")

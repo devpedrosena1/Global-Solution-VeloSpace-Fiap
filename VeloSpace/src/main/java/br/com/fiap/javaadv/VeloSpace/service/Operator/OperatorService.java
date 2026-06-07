@@ -11,6 +11,8 @@ public interface OperatorService<T, ID> {
 
     T findById(ID id, JwtUserData authUser);
 
+    T findByUserAccountId(ID id, JwtUserData authUser);
+
     Page<T> findAllByLaunchProviderId(
             ID id, int page, int items, OperatorSortField sortBy, String direction, JwtUserData authUser);
 

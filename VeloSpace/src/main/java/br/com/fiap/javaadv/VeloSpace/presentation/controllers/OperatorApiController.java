@@ -30,10 +30,9 @@ public class OperatorApiController {
     @GetMapping("/me")
     @Operation(summary = "Buscar meu Operator", description = "Retorna os dados do Operator associado ao usuário autenticado.")
     public ResponseEntity<OperatorResponseDTO> findByMe(
-            @PathVariable Long id,
             @AuthenticationPrincipal JwtUserData authUser) {
 
-        Operator operator = operatorService.findById(authUser.userId(), authUser);
+        Operator operator = operatorService.findByUserAccountId(authUser.userId(), authUser);
         return ResponseEntity.ok(OperatorResponseDTO.from(operator));
     }
 

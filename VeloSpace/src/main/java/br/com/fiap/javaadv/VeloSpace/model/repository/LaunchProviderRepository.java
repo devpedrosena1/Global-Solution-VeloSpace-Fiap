@@ -14,4 +14,6 @@ public interface LaunchProviderRepository extends JpaRepository<LaunchProvider, 
 
     Optional<LaunchProvider> findByCnpj(String cnpj);
 
+    Optional<LaunchProvider> findByUserAccount_UserAccountId(Long userAccountId);
+
 }

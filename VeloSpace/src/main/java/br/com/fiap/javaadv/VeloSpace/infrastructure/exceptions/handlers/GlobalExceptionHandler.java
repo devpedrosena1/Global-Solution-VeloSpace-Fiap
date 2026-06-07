@@ -15,11 +15,13 @@ import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.BusinessRuleExcep
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.FieldValidationException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     private final SnakeCaseStrategy snakeCaseStrategy = new SnakeCaseStrategy();
@@ -72,7 +74,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessRuleException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleBusinessRuleException(
-            NotFoundException ex) {
+            BusinessRuleException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("message", ex.getMessage()));
@@ -81,7 +83,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResponseEntity<Map<String, String>> handleForbiddenException(
-            NotFoundException ex) {
+            ForbiddenException ex) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(Map.of("message", ex.getMessage()));
@@ -90,7 +92,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Map<String, String>> handleGenericException(RuntimeException exception) {
-        System.out.println(exception);
+        log.error("Internal Error", exception);
 
         Map<String, String> errors = new HashMap<>();
         errors.put("message", exception.getMessage());

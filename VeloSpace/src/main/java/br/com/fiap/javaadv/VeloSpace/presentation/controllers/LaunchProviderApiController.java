@@ -46,10 +46,9 @@ public class LaunchProviderApiController {
     @GetMapping("/me")
     @Operation(summary = "Buscar meu Launch Provider", description = "Retorna os dados do Launch Provider vinculado ao usuário autenticado.")
     public ResponseEntity<LaunchProviderResponseDTO> findByMe(
-            @PathVariable Long id,
             @AuthenticationPrincipal JwtUserData authUser) {
 
-        LaunchProvider launchProvider = launchProviderService.findById(authUser.userId(), authUser);
+        LaunchProvider launchProvider = launchProviderService.findByUserAccountId(authUser.userId(), authUser);
         return ResponseEntity.ok(LaunchProviderResponseDTO.from(launchProvider));
     }
 

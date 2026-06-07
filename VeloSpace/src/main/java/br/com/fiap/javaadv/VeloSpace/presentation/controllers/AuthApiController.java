@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthApiController {
 
     private final AuthenticationManager authenticationManager;
+
     private final JwtHelper jwtHelper;
 
     @PostMapping
