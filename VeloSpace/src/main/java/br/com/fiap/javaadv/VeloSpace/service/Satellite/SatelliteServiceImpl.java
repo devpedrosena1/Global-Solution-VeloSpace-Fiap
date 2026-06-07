@@ -48,7 +48,7 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
 
     private final SatellitePriorityService<SatellitePriority, Long> satellitePriorityService;
 
-    private DeliveryFeignClient deliveryClient;
+    private final DeliveryFeignClient deliveryClient;
 
     private void validateShipperOwner(JwtUserData authUser, Satellite satellite) {
         Long shipperUserAccountId = satellite.getShipper().getUserAccount().getUserAccountId();
@@ -62,7 +62,7 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
     private void validateOperatorRelated(JwtUserData authUser, Satellite satellite) {
         Operator operator = operatorService.findByUserAccountIdOrThrow(authUser.userId());
 
-        if (operator.getLaunchProvider().equals(satellite.getLaunchProvider())) {
+        if (!Objects.equals(operator.getLaunchProvider(), satellite.getLaunchProvider())) {
             throw new ForbiddenException(
                     "Você não possui permissão para acessar este satélite.");
         }
@@ -99,7 +99,11 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
         }
     }
 
-    private void changeStatus(Satellite satellite, String statusCode) {
+    private void changeStatus(Satellite satellite, String trackStatus) {
+        String statusCode = "DELIVERED".equals(trackStatus)
+                ? "PENDING_INSPECTION"
+                : trackStatus;
+
         SatelliteStatus status = satelliteStatusService.getRequiredByCode(statusCode);
         satellite.setSatelliteStatus(status);
         satelliteRepository.save(satellite);
@@ -237,7 +241,7 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
 
         String trackStatus = trackSatellite(trackingCode);
 
-        satellite.setTrackingCode(trackingCode);
+        satellite.setTrackingCode(trackStatus);
         changeStatus(satellite, trackStatus);
 
         satelliteRepository.save(satellite);

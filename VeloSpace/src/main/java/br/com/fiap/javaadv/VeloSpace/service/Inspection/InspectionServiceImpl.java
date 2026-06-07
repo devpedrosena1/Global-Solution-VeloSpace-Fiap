@@ -35,7 +35,7 @@ public class InspectionServiceImpl implements InspectionService<Inspection, Long
     private final SatelliteStatusService<SatelliteStatus, Long> satelliteStatusService;
 
     private void validateOperatorRelated(JwtUserData authUser, Satellite satellite) {
-        Operator operator = operatorService.findByIdOrThrow(authUser.userId());
+        Operator operator = operatorService.findByUserAccountIdOrThrow(authUser.userId());
 
         if (!Objects.equals(operator.getLaunchProvider(), satellite.getLaunchProvider())) {
             throw new ForbiddenException(
@@ -97,6 +97,7 @@ public class InspectionServiceImpl implements InspectionService<Inspection, Long
                 inspection.getSatellite().getSatelliteId());
 
         validateOperatorRelated(authUser, satellite);
+        Operator operator = operatorService.findByUserAccountIdOrThrow(authUser.userId());
 
         validateCurrentSatelliteStatus(
                 satellite,
@@ -104,15 +105,16 @@ public class InspectionServiceImpl implements InspectionService<Inspection, Long
                 "Só é possível realizar a inspeção de um satélite que está aguardando inspeção.");
 
         inspection.setSatellite(satellite);
+        inspection.setOperator(operator);
         inspection.setInspectionDate(LocalDateTime.now());
 
-        boolean inspectionResult = shouldRejectSatellite(inspection, satellite);
+        boolean rejectSatellite = shouldRejectSatellite(inspection, satellite);
 
-        inspection.setResult(inspectionResult ? InspectionResult.A : InspectionResult.R);
+        inspection.setResult(rejectSatellite ? InspectionResult.R : InspectionResult.A);
 
         Inspection savedInspection = inspectionRepository.save(inspection);
 
-        updateSatelliteStatusAfterInspection(satellite, inspectionResult
+        updateSatelliteStatusAfterInspection(satellite, rejectSatellite
                 ? "INSPECTION_REJECTED"
                 : "READY_FOR_LAUNCH");
 
