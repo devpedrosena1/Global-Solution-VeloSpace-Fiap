@@ -35,7 +35,7 @@ public class InspectionServiceImpl implements InspectionService<Inspection, Long
     private final SatelliteStatusService<SatelliteStatus, Long> satelliteStatusService;
 
     private void validateOperatorRelated(JwtUserData authUser, Satellite satellite) {
-        Operator operator = operatorService.findByIdOrThrow(authUser.userId());
+        Operator operator = operatorService.findByUserAccountIdOrThrow(authUser.userId());
 
         if (!Objects.equals(operator.getLaunchProvider(), satellite.getLaunchProvider())) {
             throw new ForbiddenException(
