@@ -92,15 +92,16 @@ public class OperatorServiceImpl implements OperatorService<Operator, Long> {
         operatorRepository.save(operator);
     }
 
-    private Operator findByUserAccountIdOrThrow(Long id) {
-        return operatorRepository.findByUserAccount_UserAccountId(id)
+    @Override
+    public Operator findByIdOrThrow(Long id) {
+        return operatorRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
                         "Operador não encontrado."));
     }
 
     @Override
-    public Operator findByIdOrThrow(Long id) {
-        return operatorRepository.findById(id)
+    public Operator findByUserAccountIdOrThrow(Long id) {
+        return operatorRepository.findByUserAccount_UserAccountId(id)
                 .orElseThrow(() -> new NotFoundException(
                         "Operador não encontrado."));
     }
