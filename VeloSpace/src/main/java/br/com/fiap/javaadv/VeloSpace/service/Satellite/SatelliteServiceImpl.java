@@ -99,7 +99,11 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
         }
     }
 
-    private void changeStatus(Satellite satellite, String statusCode) {
+    private void changeStatus(Satellite satellite, String trackStatus) {
+        String statusCode = "DELIVERED".equals(trackStatus)
+                ? "PENDING_INSPECTION"
+                : trackStatus;
+
         SatelliteStatus status = satelliteStatusService.getRequiredByCode(statusCode);
         satellite.setSatelliteStatus(status);
         satelliteRepository.save(satellite);
@@ -237,11 +241,7 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
 
         String trackStatus = trackSatellite(trackingCode);
 
-        String statusCode = "DELIVERED".equals(trackingCode)
-                ? "PENDING_INSPECTION"
-                : trackingCode;
-
-        satellite.setTrackingCode(statusCode);
+        satellite.setTrackingCode(trackStatus);
         changeStatus(satellite, trackStatus);
 
         satelliteRepository.save(satellite);
