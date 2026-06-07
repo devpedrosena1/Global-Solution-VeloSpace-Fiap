@@ -7,9 +7,11 @@ import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.ForbiddenExceptio
 import br.com.fiap.javaadv.VeloSpace.infrastructure.exceptions.NotFoundException;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.security.JwtUserData;
 import br.com.fiap.javaadv.VeloSpace.model.LaunchProvider;
+import br.com.fiap.javaadv.VeloSpace.model.Operator;
 import br.com.fiap.javaadv.VeloSpace.model.UserAccount;
 import br.com.fiap.javaadv.VeloSpace.model.UserRole;
 import br.com.fiap.javaadv.VeloSpace.model.repository.LaunchProviderRepository;
+import br.com.fiap.javaadv.VeloSpace.model.repository.OperatorRepository;
 import br.com.fiap.javaadv.VeloSpace.service.UserRole.UserRoleService;
 import br.com.fiap.javaadv.VeloSpace.service.UserValidation.UserValidationService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
 
     private final LaunchProviderRepository launchProviderRepository;
 
+    private final OperatorRepository operatorRepository;
+
     private final UserValidationService userValidationService;
 
     private final UserRoleService<UserRole, Long> userRoleService;
@@ -39,6 +43,32 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
             throw new ForbiddenException(
                     "Você não possui permissão para acessar esta provedora de lançamento.");
         }
+    }
+
+    private void validateOperatorRelated(JwtUserData authUser, LaunchProvider launchProvider) {
+        Operator operator = operatorRepository.findByUserAccount_UserAccountId(authUser.userId())
+                .orElseThrow(() -> new NotFoundException(
+                        "Operador não encontrado."));
+
+        if (!Objects.equals(operator.getLaunchProvider(), launchProvider)) {
+            throw new ForbiddenException(
+                    "Você não possui permissão para acessar esta provedora de lançamento.");
+        }
+    }
+
+    private void validateAccess(JwtUserData authUser, LaunchProvider launchProvider) {
+        if (authUser.role().equals(Role.LAUNCH_PROVIDER)) {
+            validateLaunchProviderOwner(authUser, launchProvider);
+            return;
+        }
+
+        if (authUser.role().equals(Role.OPERATOR)) {
+            validateOperatorRelated(authUser, launchProvider);
+            return;
+        }
+
+        throw new ForbiddenException(
+                "Você não possui permissão para acessar este satélite.");
     }
 
     private LaunchProvider findByUserAccountIdOrThrow(Long id) {
@@ -66,7 +96,7 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
     @Override
     public LaunchProvider findById(Long id, JwtUserData authUser) {
         LaunchProvider launchProvider = findByIdOrThrow(id);
-        validateLaunchProviderOwner(authUser, launchProvider);
+        validateAccess(authUser, launchProvider);
         return launchProvider;
     }
 

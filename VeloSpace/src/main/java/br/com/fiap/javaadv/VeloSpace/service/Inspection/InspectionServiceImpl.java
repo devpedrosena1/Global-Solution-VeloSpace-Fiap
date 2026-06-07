@@ -108,13 +108,13 @@ public class InspectionServiceImpl implements InspectionService<Inspection, Long
         inspection.setOperator(operator);
         inspection.setInspectionDate(LocalDateTime.now());
 
-        boolean inspectionResult = shouldRejectSatellite(inspection, satellite);
+        boolean rejectSatellite = shouldRejectSatellite(inspection, satellite);
 
-        inspection.setResult(inspectionResult ? InspectionResult.A : InspectionResult.R);
+        inspection.setResult(rejectSatellite ? InspectionResult.R : InspectionResult.A);
 
         Inspection savedInspection = inspectionRepository.save(inspection);
 
-        updateSatelliteStatusAfterInspection(satellite, inspectionResult
+        updateSatelliteStatusAfterInspection(satellite, rejectSatellite
                 ? "INSPECTION_REJECTED"
                 : "READY_FOR_LAUNCH");
 

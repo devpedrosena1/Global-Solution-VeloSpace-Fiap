@@ -62,7 +62,7 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
     private void validateOperatorRelated(JwtUserData authUser, Satellite satellite) {
         Operator operator = operatorService.findByUserAccountIdOrThrow(authUser.userId());
 
-        if (operator.getLaunchProvider().equals(satellite.getLaunchProvider())) {
+        if (!Objects.equals(operator.getLaunchProvider(), satellite.getLaunchProvider())) {
             throw new ForbiddenException(
                     "Você não possui permissão para acessar este satélite.");
         }
