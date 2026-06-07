@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +36,7 @@ public class InspectionServiceImpl implements InspectionService<Inspection, Long
     private void validateOperatorRelated(JwtUserData authUser, Satellite satellite) {
         Operator operator = operatorService.findByUserAccountIdOrThrow(authUser.userId());
 
-        if (!Objects.equals(operator.getLaunchProvider(), satellite.getLaunchProvider())) {
+        if (operator.getLaunchProvider().equals(satellite.getLaunchProvider())) {
             throw new ForbiddenException(
                     "Você não possui permissão para acessar esta inspeção.");
         }
@@ -97,6 +96,7 @@ public class InspectionServiceImpl implements InspectionService<Inspection, Long
                 inspection.getSatellite().getSatelliteId());
 
         validateOperatorRelated(authUser, satellite);
+        Operator operator = operatorService.findByUserAccountIdOrThrow(authUser.userId());
 
         validateCurrentSatelliteStatus(
                 satellite,
@@ -104,6 +104,7 @@ public class InspectionServiceImpl implements InspectionService<Inspection, Long
                 "Só é possível realizar a inspeção de um satélite que está aguardando inspeção.");
 
         inspection.setSatellite(satellite);
+        inspection.setOperator(operator);
         inspection.setInspectionDate(LocalDateTime.now());
 
         boolean inspectionResult = shouldRejectSatellite(inspection, satellite);
