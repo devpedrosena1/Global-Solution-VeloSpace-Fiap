@@ -41,6 +41,12 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
         }
     }
 
+    private LaunchProvider findByUserAccountIdOrThrow(Long id) {
+        return launchProviderRepository.findByUserAccount_UserAccountId(id)
+                .orElseThrow(() -> new NotFoundException(
+                        "Provedora de lançamento não encontrada."));
+    }
+
     @Override
     public LaunchProvider findByIdOrThrow(Long id) {
         return launchProviderRepository.findById(id)
@@ -60,6 +66,13 @@ public class LaunchProviderServiceImpl implements LaunchProviderService<LaunchPr
     @Override
     public LaunchProvider findById(Long id, JwtUserData authUser) {
         LaunchProvider launchProvider = findByIdOrThrow(id);
+        validateLaunchProviderOwner(authUser, launchProvider);
+        return launchProvider;
+    }
+
+    @Override
+    public LaunchProvider findByUserAccountId(Long id, JwtUserData authUser) {
+        LaunchProvider launchProvider = findByUserAccountIdOrThrow(id);
         validateLaunchProviderOwner(authUser, launchProvider);
         return launchProvider;
     }

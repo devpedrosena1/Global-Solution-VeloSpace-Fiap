@@ -8,6 +8,7 @@
         "jackson",
         "javaadv",
         "jdbc",
+        "nullable",
         "springdoc",
         "springframework"
     ]

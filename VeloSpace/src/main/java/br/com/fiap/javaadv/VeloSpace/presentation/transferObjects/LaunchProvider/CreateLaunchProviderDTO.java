@@ -20,7 +20,7 @@ public class CreateLaunchProviderDTO {
 
     @NotNull(message = "O CNPJ não pode ser nulo")
     @Digits(integer = 14, fraction = 0, message = "O CNPJ deve conter no máximo 14 dígitos")
-    @CNPJ
+    @CNPJ(message = "CNPJ inválido")
     private String cnpj;
 
     @NotBlank(message = "A razão social não pode estar em branco")

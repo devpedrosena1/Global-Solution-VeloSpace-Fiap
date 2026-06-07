@@ -11,4 +11,5 @@ public interface ShipperRepository extends JpaRepository<Shipper, Long> {
     Optional<Shipper> findByUserAccount_UserAccountId(Long id);
 
     Optional<Shipper> findByShipperDocument(String shipperDocument);
+
 }

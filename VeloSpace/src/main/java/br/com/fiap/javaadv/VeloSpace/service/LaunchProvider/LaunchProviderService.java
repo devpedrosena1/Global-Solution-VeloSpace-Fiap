@@ -13,6 +13,8 @@ public interface LaunchProviderService<T, ID> {
 
     T findById(ID id, JwtUserData authUser);
 
+    T findByUserAccountId(ID id, JwtUserData authUser);
+
     T create(T o);
 
     T updateById(ID id, T o, JwtUserData authUser);

@@ -3,7 +3,6 @@ package br.com.fiap.javaadv.VeloSpace.presentation.transferObjects.Shipper;
 import br.com.fiap.javaadv.VeloSpace.infrastructure.enums.ShipperType;
 import br.com.fiap.javaadv.VeloSpace.model.Shipper;
 import br.com.fiap.javaadv.VeloSpace.model.UserAccount;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -22,7 +21,7 @@ public class CreateShipperDTO {
     private String type;
 
     @NotBlank(message = "O documento não pode estar em branco")
-    @Digits(integer = 14, fraction = 0, message = "O documento deve conter no máximo 14 dígitos")
+    @Pattern(regexp = "^\\d{0,14}$", message = "O documento do expedidor deve conter apenas números e no máximo 14 dígitos")
     private String shipperDocument;
 
     @NotBlank(message = "O nome não pode estar em branco")
