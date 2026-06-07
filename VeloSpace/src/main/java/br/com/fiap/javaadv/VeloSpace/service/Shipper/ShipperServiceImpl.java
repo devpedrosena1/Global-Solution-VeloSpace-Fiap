@@ -49,7 +49,7 @@ public class ShipperServiceImpl implements ShipperService<Shipper, Long> {
             } catch (Exception e) {
                 throw new FieldValidationException(
                         "shipperDocument",
-                        "CNPJ inválido");
+                        "CPF inválido");
             }
 
             return;

@@ -9,6 +9,8 @@ public interface OperatorService<T, ID> {
 
     T findByIdOrThrow(ID id);
 
+    T findByUserAccountIdOrThrow(ID id);
+
     T findById(ID id, JwtUserData authUser);
 
     T findByUserAccountId(ID id, JwtUserData authUser);

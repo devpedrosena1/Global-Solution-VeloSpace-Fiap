@@ -98,7 +98,7 @@ public class LaunchProviderApiController {
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int items,
-            @RequestParam(defaultValue = "operatorId") SatelliteSortField sortBy,
+            @RequestParam(defaultValue = "satelliteId") SatelliteSortField sortBy,
             @RequestParam(defaultValue = "asc") String direction,
             @AuthenticationPrincipal JwtUserData authUser) {
 
