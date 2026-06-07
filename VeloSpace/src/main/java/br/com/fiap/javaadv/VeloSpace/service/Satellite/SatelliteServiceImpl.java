@@ -48,7 +48,7 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
 
     private final SatellitePriorityService<SatellitePriority, Long> satellitePriorityService;
 
-    private DeliveryFeignClient deliveryClient;
+    private final DeliveryFeignClient deliveryClient;
 
     private void validateShipperOwner(JwtUserData authUser, Satellite satellite) {
         Long shipperUserAccountId = satellite.getShipper().getUserAccount().getUserAccountId();
