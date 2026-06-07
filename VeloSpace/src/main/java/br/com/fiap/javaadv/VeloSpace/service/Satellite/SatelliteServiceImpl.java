@@ -237,7 +237,11 @@ public class SatelliteServiceImpl implements SatelliteService<Satellite, Long> {
 
         String trackStatus = trackSatellite(trackingCode);
 
-        satellite.setTrackingCode(trackingCode);
+        String statusCode = "DELIVERED".equals(trackingCode)
+                ? "PENDING_INSPECTION"
+                : trackingCode;
+
+        satellite.setTrackingCode(statusCode);
         changeStatus(satellite, trackStatus);
 
         satelliteRepository.save(satellite);
