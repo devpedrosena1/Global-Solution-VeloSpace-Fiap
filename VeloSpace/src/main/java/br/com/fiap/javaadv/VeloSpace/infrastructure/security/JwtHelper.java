@@ -27,6 +27,8 @@ public class JwtHelper {
         Algorithm algorithm = Algorithm.HMAC256(jwtProperties.getSecret());
 
         return JWT.create()
+                .withIssuer("VeloSpaceApi")
+                .withAudience("VeloSpaceClient")
                 .withClaim("userId", user.getUserAccountId())
                 .withClaim("role", user.getUserRole().getCode().name())
                 .withSubject(user.getEmail())
