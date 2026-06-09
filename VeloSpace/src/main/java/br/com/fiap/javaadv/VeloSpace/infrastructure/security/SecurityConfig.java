@@ -35,7 +35,8 @@ public class SecurityConfig {
                                 "/",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/swagger-ui/**")
+                                "/swagger-ui/**",
+                                "/api/v1/test")
                         .permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth")
