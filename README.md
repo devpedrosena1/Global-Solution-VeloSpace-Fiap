@@ -1,6 +1,6 @@
 ![Banner](/VeloSpace/docs/LogoFinal.jpeg)
 
-![Java 21](https://img.shields.io/badge/Java%2021-007396?style=for-the-badge&logo=openjdk&logoColor=white) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white) ![ActiveMQ](https://img.shields.io/badge/ActiveMQ-ED2B2B?style=for-the-badge&logo=apacheactivemq&logoColor=white) ![Oracle](https://img.shields.io/badge/Oracle%20Cloud-F80000?style=for-the-badge&logo=oracle&logoColor=white) [![FIAP](https://img.shields.io/badge/FIAP-ED145B?style=for-the-badge&logoColor=white)]()
+![Java 21](https://img.shields.io/badge/Java%2021-007396?style=for-the-badge&logo=openjdk&logoColor=white) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white) ![ActiveMQ](https://img.shields.io/badge/ActiveMQ-ED2B2B?style=for-the-badge&logo=apacheactivemq&logoColor=white) ![Oracle](https://img.shields.io/badge/Oracle%20Cloud-F80000?style=for-the-badge&logo=oracle&logoColor=white) [![FIAP](https://img.shields.io/badge/FIAP-ED145B?style=for-the-badge&logoColor=white)]() ![Azure](https://img.shields.io/badge/Azure%20Cloud-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
 
 O VeloSpace é uma plataforma de gerenciamento de cargas espaciais que conecta embarcadores, provedores de lançamento e operadores de payload. Seu objetivo é centralizar e automatizar o fluxo de envio de cargas ao espaço, desde o cadastro e triagem dos payloads até a aprovação, rastreamento e lançamento.
 
@@ -16,11 +16,11 @@ A aplicação permite o cadastro de embarcadores e provedores de lançamento, ge
 
 ## Vídeo Pitch
 
-**Assista no YouTube:** [https://youtu.be/jwT6pl8h4AI](https://youtu.be/jwT6pl8h4AI)
+**Assista no YouTube:** [https://youtu.be/ukyb5AFKqiA](https://youtu.be/ukyb5AFKqiA)
 
 ## Demonstração da Solução
 
-**Assista no YouTube:** [https://youtu.be/_XM47GfITTA](https://youtu.be/_XM47GfITTA)
+**Assista no YouTube:** [https://youtu.be/Y3aOr6lk_QI](https://youtu.be/Y3aOr6lk_QI)
 
 ## Deploy
 
@@ -253,8 +253,13 @@ A documentação interativa (Swagger UI) pode ser acessada em: http://localhost:
 
 ## Desenvolvedores
 
-[@Cleytonrik99](https://github.com/Cleytonrik99) - Desenvolvedor Backend  
-[@EnzoAzevedo](https://github.com/enzoazevedo) - Desenvolvedor Backend 
+
+[@Cleytonrik99](https://github.com/Cleytonrik99) - Desenvolvedor Backend
+
+[@EnzoAzevedo](https://github.com/enzoazevedo) - Desenvolvedor Backend
+
 [@MatheusHenriqueNF](https://github.com/MatheusHenriqueNF) - Desenvolvedor Mobile
+
 [@PauloSérgioFB](https://github.com/paulgramador) - Desenvolvedor Backend e Mobile
-[@devpedrosena1](https://github.com/devpedrosena1) - Desenvolvedor backend e DevOps
+
+[@devpedrosena1](https://github.com/devpedrosena1) - Desenvolvedor Backend e DevOps
