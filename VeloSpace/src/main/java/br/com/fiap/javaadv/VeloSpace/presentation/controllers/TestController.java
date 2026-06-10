@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     @GetMapping("/test")
-    @Operation(summary = "Teste", description = "Endpoint de teste para verificar se a aplicação está funcionando corretamente")
+    @Operation(summary = "Teste Ataulizado pela Pipeline", description = "Endpoint de teste para verificar se a aplicação está funcionando corretamente")
     public String test() {
-        return "Testando o controller";
+        return "Testando o controller e pipeline junto!!!";
     }
 
 }
