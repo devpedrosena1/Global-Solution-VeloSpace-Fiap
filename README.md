@@ -14,6 +14,10 @@ A aplicação permite o cadastro de embarcadores e provedores de lançamento, ge
 
 ---
 
+## Versão com Execução Facilitada
+
+**Repositório:** [https://github.com/PauloSergioFB/velospace-api-compose](https://github.com/PauloSergioFB/velospace-api-compose)
+
 ## Vídeo Pitch
 
 **Assista no YouTube:** [https://youtu.be/ukyb5AFKqiA](https://youtu.be/ukyb5AFKqiA)
